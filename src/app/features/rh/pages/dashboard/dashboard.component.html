@@ -10,7 +10,8 @@
       [tone]="card.tone"
       [variant]="card.variant"
       [clickable]="true"
-      (cardClick)="openCard(card.route, card.queryParams)">
+      (cardClick)="openCard(card.route, card.queryParams)"
+    >
     </app-kpi-card>
   </div>
 
@@ -26,7 +27,8 @@
     <app-department-card
       *ngIf="managerDepartmentCard"
       [department]="managerDepartmentCard"
-      (details)="loadDepartmentDetails($event)">
+      (details)="loadDepartmentDetails($event)"
+    >
     </app-department-card>
   </section>
 
@@ -42,7 +44,8 @@
       <app-department-card
         *ngFor="let department of departments"
         [department]="department"
-        (details)="loadDepartmentDetails($event)">
+        (details)="loadDepartmentDetails($event)"
+      >
       </app-department-card>
     </div>
 
@@ -63,22 +66,29 @@
           <button
             type="button"
             [class.active]="newFollowUpType === 'department'"
-            (click)="setNewFollowUpType('department')">
+            (click)="setNewFollowUpType('department')"
+          >
             Departement
           </button>
           <button
             type="button"
             [class.active]="newFollowUpType === 'employee'"
-            (click)="setNewFollowUpType('employee')">
+            (click)="setNewFollowUpType('employee')"
+          >
             Collaborateur
           </button>
         </div>
 
         <div class="follow-up-create-form">
           <ng-container *ngIf="newFollowUpType === 'department'; else employeeTarget">
-            <select [value]="newFollowUpValue" (change)="newFollowUpValue = $any($event.target).value">
+            <select
+              [value]="newFollowUpValue"
+              (change)="newFollowUpValue = $any($event.target).value"
+            >
               <option value="">Choisir un departement</option>
-              <option *ngFor="let department of departments" [value]="department.name">{{ department.name }}</option>
+              <option *ngFor="let department of departments" [value]="department.name">
+                {{ department.name }}
+              </option>
             </select>
           </ng-container>
 
@@ -88,12 +98,14 @@
                 type="text"
                 [value]="newFollowUpValue"
                 (input)="newFollowUpValue = $any($event.target).value"
-                placeholder="Matricule, nom ou prenom" />
+                placeholder="Matricule, nom ou prenom"
+              />
               <div class="employee-target-list" *ngIf="newFollowUpValue.trim()">
                 <button
                   type="button"
                   *ngFor="let option of availableEmployeeOptions"
-                  (click)="newFollowUpValue = option.matricule">
+                  (click)="newFollowUpValue = option.matricule"
+                >
                   {{ option.firstName }} {{ option.lastName }} - {{ option.matricule }}
                 </button>
               </div>
@@ -109,9 +121,14 @@
           type="button"
           class="saved-follow-up-chip"
           *ngFor="let target of savedFollowUps"
-          (click)="activateFollowUp(target)">
+          (click)="activateFollowUp(target)"
+        >
           <span>{{ target.label }}</span>
-          <span class="saved-follow-up-remove" (click)="$event.stopPropagation(); removeFollowUp(target)">×</span>
+          <span
+            class="saved-follow-up-remove"
+            (click)="$event.stopPropagation(); removeFollowUp(target)"
+            >×</span
+          >
         </button>
       </div>
 
@@ -121,7 +138,8 @@
           <select
             id="follow-up-department"
             [value]="followUpDepartment"
-            (change)="onFollowUpDepartmentChange($any($event.target).value)">
+            (change)="onFollowUpDepartmentChange($any($event.target).value)"
+          >
             <option value="all">Tous les departements</option>
             <option *ngFor="let department of departments" [value]="department.name">
               {{ department.name }}
@@ -136,7 +154,8 @@
             type="text"
             [value]="followUpSearch"
             (input)="onFollowUpSearchChange($any($event.target).value)"
-            placeholder="Rechercher par matricule, nom ou prenom" />
+            placeholder="Rechercher par matricule, nom ou prenom"
+          />
         </div>
       </div>
 
@@ -170,13 +189,16 @@
                   [class.absent]="row.status === 'Absent'"
                   [class.travel]="row.status === 'Deplacement'"
                   [class.leave]="row.status === 'Conge'"
-                  [class.other]="row.status === 'Autres'">
+                  [class.other]="row.status === 'Autres'"
+                >
                   {{ row.status }}
                 </span>
               </td>
             </tr>
             <tr *ngIf="!followUpRows.length">
-              <td colspan="8" class="empty-state">Aucun collaborateur ne correspond au filtre selectionne.</td>
+              <td colspan="8" class="empty-state">
+                Aucun collaborateur ne correspond au filtre selectionne.
+              </td>
             </tr>
           </tbody>
         </table>
@@ -217,7 +239,8 @@
                 [class.absent]="row.status === 'Absent'"
                 [class.travel]="row.status === 'Deplacement'"
                 [class.leave]="row.status === 'Conge'"
-                [class.other]="row.status === 'Autres'">
+                [class.other]="row.status === 'Autres'"
+              >
                 {{ row.status }}
               </span>
             </td>
@@ -235,10 +258,14 @@
     <section class="card main-chart-card">
       <div class="section-head">
         <div>
-          <span class="section-eyebrow">{{ isRhView ? 'Analyse hebdomadaire' : 'Analyse de la semaine' }}</span>
+          <span class="section-eyebrow">{{
+            isRhView ? 'Analyse hebdomadaire' : 'Analyse de la semaine'
+          }}</span>
           <h3>Tendance des presences</h3>
         </div>
-        <span class="section-badge">{{ isRhView ? 'Mise a jour automatique' : managerDepartmentLabel }}</span>
+        <span class="section-badge">{{
+          isRhView ? 'Mise a jour automatique' : managerDepartmentLabel
+        }}</span>
       </div>
 
       <div class="chart-wrap chart-wrap-lg">
@@ -306,7 +333,9 @@
               </td>
             </tr>
             <tr *ngIf="!managerAlerts.length">
-              <td [attr.colspan]="isRhView ? 5 : 4" class="empty-state">Aucune alerte active pour ce departement.</td>
+              <td [attr.colspan]="isRhView ? 5 : 4" class="empty-state">
+                Aucune alerte active pour ce departement.
+              </td>
             </tr>
           </tbody>
         </table>
