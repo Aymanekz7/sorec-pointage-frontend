@@ -1,0 +1,267 @@
+.sidebar {
+  width: 270px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.26), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+    var(--sorec-theme-panel);
+  color: #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow:
+    18px 0 48px rgba(86, 67, 26, 0.12),
+    inset -1px 0 0 rgba(255, 255, 255, 0.12);
+  transition: padding 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, width 0.22s ease;
+}
+
+.sidebar.compact {
+  width: 98px;
+}
+
+.sidebar.compact:hover {
+  width: 270px;
+  overflow: visible;
+}
+
+.brand {
+  padding: 0.55rem 0.55rem 0.3rem;
+  display: grid;
+  justify-items: center;
+  transition: padding 0.22s ease;
+}
+
+.brand-logo {
+  width: 100%;
+  max-width: 108px;
+  display: block;
+  transition: max-width 0.22s ease, transform 0.22s ease;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.22rem;
+  padding: 0.45rem 0.5rem;
+  transition: padding 0.22s ease, gap 0.22s ease;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--sorec-text-strong);
+  text-decoration: none;
+  padding: 0.56rem 0.62rem;
+  border-radius: 13px;
+  transition: 0.22s ease;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition:
+    0.22s ease,
+    font-size 0.22s ease,
+    padding 0.22s ease,
+    border-radius 0.22s ease,
+    gap 0.22s ease;
+}
+
+.menu a span:last-child {
+  white-space: nowrap;
+}
+
+.menu a:hover,
+.menu a.active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(246, 235, 203, 0.34));
+  color: var(--sorec-text-strong);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateX(3px);
+  box-shadow: 0 10px 22px rgba(24, 16, 8, 0.14);
+}
+
+.icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(31, 31, 31, 0.06);
+  transition: width 0.22s ease, height 0.22s ease, border-radius 0.22s ease;
+}
+
+.icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  color: currentColor;
+  transition: width 0.22s ease, height 0.22s ease;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  justify-items: center;
+  padding: 0.4rem 0.5rem 0.55rem;
+  background: linear-gradient(180deg, rgba(179, 155, 87, 0) 0%, rgba(179, 155, 87, 0.16) 24%);
+}
+
+.public-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 150px);
+  appearance: none;
+  text-decoration: none;
+  text-align: center;
+  border-radius: 13px;
+  padding: 0.54rem 0.62rem;
+  color: var(--sorec-text-strong);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(246, 235, 203, 0.22));
+  font-size: 0.74rem;
+  font-weight: 650;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  outline: none;
+  transition: padding 0.22s ease, font-size 0.22s ease, opacity 0.18s ease;
+  cursor: pointer;
+}
+
+.sidebar.compact .brand {
+  padding-top: 0.85rem;
+  padding-bottom: 0.35rem;
+}
+
+.sidebar.compact .brand-logo {
+  max-width: 58px;
+}
+
+.sidebar.compact:hover .brand-logo {
+  max-width: 108px;
+}
+
+.sidebar.compact .menu {
+  gap: 0.24rem;
+  padding-top: 0.55rem;
+}
+
+.sidebar.compact .menu a {
+  justify-content: center;
+  gap: 0;
+  padding: 0.7rem 0.5rem;
+  font-size: 0;
+  border-radius: 14px;
+}
+
+.sidebar.compact .menu a span:last-child {
+  display: none;
+}
+
+.sidebar.compact:hover .menu a {
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.56rem 0.62rem;
+  font-size: 0.74rem;
+}
+
+.sidebar.compact:hover .menu a span:last-child {
+  display: inline;
+}
+
+.sidebar.compact .icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+}
+
+.sidebar.compact .icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sidebar.compact .sidebar-footer {
+  padding-inline: 0.3rem;
+}
+
+.sidebar.compact .public-link {
+  opacity: 0;
+  pointer-events: none;
+  width: 100%;
+  max-width: 0;
+  padding-inline: 0;
+  overflow: hidden;
+}
+
+.sidebar.compact:hover .public-link {
+  opacity: 1;
+  pointer-events: auto;
+  max-width: 150px;
+  padding-inline: 0.62rem;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 98px;
+  }
+
+  .brand {
+    padding-inline: 0.75rem;
+  }
+
+  .brand-logo {
+    width: 64px;
+    max-width: 64px;
+  }
+
+  .menu a span:last-child,
+  .public-link {
+    display: none;
+  }
+
+  .menu a {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    box-shadow: none;
+  }
+
+  .brand {
+    padding-bottom: 0.5rem;
+  }
+
+  .brand-logo {
+    width: 140px;
+    max-width: 140px;
+  }
+
+  .menu {
+    padding-top: 0.5rem;
+  }
+
+  .menu a span:last-child,
+  .public-link {
+    display: inline;
+  }
+
+  .menu a {
+    justify-content: flex-start;
+  }
+
+  .sidebar-footer {
+    position: static;
+    background: transparent;
+  }
+}

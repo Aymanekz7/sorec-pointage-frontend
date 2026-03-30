@@ -1,0 +1,37 @@
+<article
+  class="threshold-card"
+  [class.tone-green]="tone === 'green'"
+  [class.tone-red]="tone === 'red'"
+  [class.tone-orange]="tone === 'orange'"
+  [class.tone-gold]="tone === 'gold'"
+  [style.--range-progress.%]="progress">
+  <div class="threshold-head">
+    <div class="threshold-copy">
+      <h4>{{ title }}</h4>
+      <p>{{ subtitle }}</p>
+    </div>
+    <span class="tone-dot" aria-hidden="true"></span>
+  </div>
+
+  <div class="threshold-controls">
+    <input
+      class="threshold-range"
+      type="range"
+      [min]="min"
+      [max]="max"
+      [value]="value"
+      (input)="onSliderInput($event)" />
+
+    <div class="value-group">
+      <div class="value-box">
+        <input
+          type="number"
+          [min]="min"
+          [max]="max"
+          [value]="value"
+          (input)="onNumberInput($event)" />
+      </div>
+      <span class="unit-label">{{ unit }}</span>
+    </div>
+  </div>
+</article>

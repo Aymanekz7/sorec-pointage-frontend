@@ -1,0 +1,41 @@
+<header class="topbar">
+  <div class="topbar-copy">
+    <span class="eyebrow">{{ eyebrow }}</span>
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="topbar-actions">
+    <div class="notif-wrap" #notifWrap>
+      <button type="button" class="notif-btn" aria-label="Notifications" [attr.aria-expanded]="notificationsOpen" (click)="toggleNotifications()">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 4.75a4 4 0 0 0-4 4v2.3c0 .66-.19 1.31-.55 1.86L6 15.2h12l-1.45-2.29A3.5 3.5 0 0 1 16 11.05v-2.3a4 4 0 0 0-4-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+          <path d="M10 18a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+        <span class="notif-badge">{{ unreadCount }}</span>
+      </button>
+
+      <div class="notif-panel" *ngIf="notificationsOpen">
+        <div class="notif-head">
+          <span>Notifications</span>
+          <div class="notif-head-actions">
+            <button type="button" class="notif-close" (click)="markAllAsRead()">Tout lire</button>
+          </div>
+        </div>
+        <button type="button" class="notif-item" *ngFor="let item of notifications" [class.unread]="!item.read" (click)="openNotification(item)">
+          <span class="notif-title">{{ item.title }}</span>
+          <span class="notif-meta">{{ item.meta }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="user-box">
+      <span class="user-avatar">{{ initials }}</span>
+      <div class="user-copy">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">{{ roleLabel }}</span>
+      </div>
+    </div>
+
+    <button class="logout-btn" (click)="logout()">Quitter</button>
+  </div>
+</header>

@@ -1,0 +1,52 @@
+<section class="config-shell">
+  <div class="config-head">
+    <div>
+      <h2>Configuration des KPI</h2>
+      <p>Configurez les seuils et paramètres des indicateurs de performance</p>
+    </div>
+
+    <div class="head-actions">
+      <button type="button" class="btn btn-light" (click)="reset()">Réinitialiser</button>
+      <button type="button" class="btn btn-primary">Enregistrer</button>
+    </div>
+  </div>
+
+  <section class="preview-block">
+    <h3>Aperçu des Indicateurs</h3>
+    <div class="preview-grid">
+      <article class="preview-card" *ngFor="let card of cards" [ngClass]="'tone-' + card.tone">
+        <h4>{{ card.title }}</h4>
+        <strong>{{ formatPreviewValue(card) }}</strong>
+        <span>Seuil configuré</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="thresholds-panel">
+    <div class="thresholds-head">
+      <div class="title-wrap">
+        <span class="gear-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M10.3 3.2h3.4l.5 2a7.6 7.6 0 0 1 1.6.7l1.8-1 2.4 2.4-1 1.8c.3.5.5 1 .7 1.6l2 .5v3.4l-2 .5a7.6 7.6 0 0 1-.7 1.6l1 1.8-2.4 2.4-1.8-1a7.6 7.6 0 0 1-1.6.7l-.5 2h-3.4l-.5-2a7.6 7.6 0 0 1-1.6-.7l-1.8 1-2.4-2.4 1-1.8a7.6 7.6 0 0 1-.7-1.6l-2-.5v-3.4l2-.5a7.6 7.6 0 0 1 .7-1.6l-1-1.8 2.4-2.4 1.8 1a7.6 7.6 0 0 1 1.6-.7l.5-2Z" />
+            <circle cx="12" cy="12" r="3.2" />
+          </svg>
+        </span>
+        <h3>Seuils des Indicateurs</h3>
+      </div>
+    </div>
+
+    <div class="thresholds-grid">
+      <app-kpi-threshold-card
+        *ngFor="let card of cards"
+        [title]="card.title"
+        [subtitle]="card.subtitle"
+        [unit]="card.unit"
+        [tone]="card.tone"
+        [value]="card.value"
+        [min]="card.min"
+        [max]="card.max"
+        (valueChange)="updateValue(card.id, $event)">
+      </app-kpi-threshold-card>
+    </div>
+  </section>
+</section>

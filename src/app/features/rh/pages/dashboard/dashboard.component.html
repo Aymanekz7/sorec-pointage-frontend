@@ -1,0 +1,316 @@
+<section class="dashboard-shell">
+  <div class="insight-grid">
+    <app-kpi-card
+      *ngFor="let card of insightCards"
+      [title]="card.title"
+      [value]="card.value"
+      [note]="card.note"
+      [subtitle]="card.subtitle"
+      [icon]="card.icon"
+      [tone]="card.tone"
+      [variant]="card.variant"
+      [clickable]="true"
+      (cardClick)="openCard(card.route, card.queryParams)">
+    </app-kpi-card>
+  </div>
+
+  <section class="card manager-overview-card" *ngIf="!isRhView">
+    <div class="section-head manager-overview-head">
+      <div>
+        <span class="section-eyebrow">Presence du jour</span>
+        <h3>Vue manager - {{ managerDepartmentLabel }}</h3>
+      </div>
+      <span class="section-badge section-badge-strong">{{ managerDepartmentLabel }}</span>
+    </div>
+
+    <app-department-card
+      *ngIf="managerDepartmentCard"
+      [department]="managerDepartmentCard"
+      (details)="loadDepartmentDetails($event)">
+    </app-department-card>
+  </section>
+
+  <section class="departments-section" *ngIf="isRhView">
+    <div class="section-head">
+      <div>
+        <span class="section-eyebrow">Synthese par departement</span>
+        <h3>Performance des departements</h3>
+      </div>
+    </div>
+
+    <div class="department-grid">
+      <app-department-card
+        *ngFor="let department of departments"
+        [department]="department"
+        (details)="loadDepartmentDetails($event)">
+      </app-department-card>
+    </div>
+
+    <section class="card department-detail-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Suivi cible</span>
+          <h3>{{ followUpTitle }}</h3>
+        </div>
+        <div class="section-actions">
+          <span class="section-badge">{{ followUpRows.length }} collaborateurs</span>
+          <button type="button" class="add-follow-up-btn" (click)="toggleAddFollowUp()">+</button>
+        </div>
+      </div>
+
+      <div class="follow-up-create-card" *ngIf="addFollowUpOpen">
+        <div class="follow-up-type-toggle">
+          <button
+            type="button"
+            [class.active]="newFollowUpType === 'department'"
+            (click)="setNewFollowUpType('department')">
+            Departement
+          </button>
+          <button
+            type="button"
+            [class.active]="newFollowUpType === 'employee'"
+            (click)="setNewFollowUpType('employee')">
+            Collaborateur
+          </button>
+        </div>
+
+        <div class="follow-up-create-form">
+          <ng-container *ngIf="newFollowUpType === 'department'; else employeeTarget">
+            <select [value]="newFollowUpValue" (change)="newFollowUpValue = $any($event.target).value">
+              <option value="">Choisir un departement</option>
+              <option *ngFor="let department of departments" [value]="department.name">{{ department.name }}</option>
+            </select>
+          </ng-container>
+
+          <ng-template #employeeTarget>
+            <div class="employee-target-wrap">
+              <input
+                type="text"
+                [value]="newFollowUpValue"
+                (input)="newFollowUpValue = $any($event.target).value"
+                placeholder="Matricule, nom ou prenom" />
+              <div class="employee-target-list" *ngIf="newFollowUpValue.trim()">
+                <button
+                  type="button"
+                  *ngFor="let option of availableEmployeeOptions"
+                  (click)="newFollowUpValue = option.matricule">
+                  {{ option.firstName }} {{ option.lastName }} - {{ option.matricule }}
+                </button>
+              </div>
+            </div>
+          </ng-template>
+
+          <button type="button" class="table-action" (click)="addFollowUp()">Ajouter</button>
+        </div>
+      </div>
+
+      <div class="saved-follow-up-list" *ngIf="savedFollowUps.length">
+        <button
+          type="button"
+          class="saved-follow-up-chip"
+          *ngFor="let target of savedFollowUps"
+          (click)="activateFollowUp(target)">
+          <span>{{ target.label }}</span>
+          <span class="saved-follow-up-remove" (click)="$event.stopPropagation(); removeFollowUp(target)">×</span>
+        </button>
+      </div>
+
+      <div class="follow-up-toolbar">
+        <div class="follow-up-field">
+          <label for="follow-up-department">Departement</label>
+          <select
+            id="follow-up-department"
+            [value]="followUpDepartment"
+            (change)="onFollowUpDepartmentChange($any($event.target).value)">
+            <option value="all">Tous les departements</option>
+            <option *ngFor="let department of departments" [value]="department.name">
+              {{ department.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="follow-up-field follow-up-field-search">
+          <label for="follow-up-search">Collaborateur cible</label>
+          <input
+            id="follow-up-search"
+            type="text"
+            [value]="followUpSearch"
+            (input)="onFollowUpSearchChange($any($event.target).value)"
+            placeholder="Rechercher par matricule, nom ou prenom" />
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table data-grid-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Matricule</th>
+              <th>Nom complet</th>
+              <th>Departement</th>
+              <th>Site</th>
+              <th>Entree</th>
+              <th>Sortie</th>
+              <th>Heures</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of followUpRows">
+              <td>{{ row.matricule }}</td>
+              <td>{{ row.firstName }} {{ row.lastName }}</td>
+              <td>{{ row.department === 'Legal' ? 'Juridique' : row.department }}</td>
+              <td>{{ row.site || '-' }}</td>
+              <td>{{ row.checkIn }}</td>
+              <td>{{ row.checkOut }}</td>
+              <td>{{ row.workedHours }}</td>
+              <td>
+                <span
+                  class="status-chip"
+                  [class.present]="row.status === 'Present'"
+                  [class.absent]="row.status === 'Absent'"
+                  [class.travel]="row.status === 'Deplacement'"
+                  [class.leave]="row.status === 'Conge'"
+                  [class.other]="row.status === 'Autres'">
+                  {{ row.status }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="!followUpRows.length">
+              <td colspan="8" class="empty-state">Aucun collaborateur ne correspond au filtre selectionne.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <section class="card manager-board-card" *ngIf="!isRhView">
+    <div class="section-head">
+      <div>
+        <span class="section-eyebrow">Presence bureau</span>
+        <h3>{{ managerDepartmentLabel }} - semaine en cours et semaine derniere</h3>
+      </div>
+      <span class="section-badge">Mise a jour automatique</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Collaborateur</th>
+            <th>Aujourd'hui</th>
+            <th>Cette semaine</th>
+            <th>Semaine derniere</th>
+            <th>Heures</th>
+            <th>Site</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of presenceBoardRows">
+            <td>{{ row.matricule }}</td>
+            <td>{{ row.firstName }} {{ row.lastName }}</td>
+            <td>
+              <span
+                class="status-chip"
+                [class.present]="row.status === 'Present'"
+                [class.absent]="row.status === 'Absent'"
+                [class.travel]="row.status === 'Deplacement'"
+                [class.leave]="row.status === 'Conge'"
+                [class.other]="row.status === 'Autres'">
+                {{ row.status }}
+              </span>
+            </td>
+            <td>{{ row.currentWeek }}</td>
+            <td>{{ row.previousWeek }}</td>
+            <td>{{ row.workedHours }}</td>
+            <td>{{ row.site || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="content-grid">
+    <section class="card main-chart-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">{{ isRhView ? 'Analyse hebdomadaire' : 'Analyse de la semaine' }}</span>
+          <h3>Tendance des presences</h3>
+        </div>
+        <span class="section-badge">{{ isRhView ? 'Mise a jour automatique' : managerDepartmentLabel }}</span>
+      </div>
+
+      <div class="chart-wrap chart-wrap-lg">
+        <div #trendChart class="highchart-host"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="pie-grid" *ngIf="isRhView">
+    <section class="card status-chart-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Presence consolidee</span>
+          <h3>Presence de toute la semaine</h3>
+        </div>
+      </div>
+
+      <div class="chart-wrap chart-wrap-md">
+        <div #weekPieChart class="highchart-host"></div>
+      </div>
+    </section>
+
+    <section class="card status-chart-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Presence consolidee</span>
+          <h3>Presence du weekend</h3>
+        </div>
+      </div>
+
+      <div class="chart-wrap chart-wrap-md">
+        <div #weekendPieChart class="highchart-host"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="lower-grid">
+    <section class="card alerts-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Alertes recentes</span>
+          <h3>Derniers signaux detectes</h3>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table data-grid-table align-middle alerts-table">
+          <thead>
+            <tr>
+              <th>Collaborateur</th>
+              <th *ngIf="isRhView">Departement</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let alert of managerAlerts">
+              <td>{{ alert.employee }}</td>
+              <td *ngIf="isRhView">{{ alert.department }}</td>
+              <td>{{ alert.type }}</td>
+              <td>{{ alert.date }}</td>
+              <td class="text-end">
+                <button type="button" class="table-action">Voir</button>
+              </td>
+            </tr>
+            <tr *ngIf="!managerAlerts.length">
+              <td [attr.colspan]="isRhView ? 5 : 4" class="empty-state">Aucune alerte active pour ce departement.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>

@@ -1,0 +1,55 @@
+<section class="login-screen">
+  <div class="cloud cloud-left"></div>
+  <div class="cloud cloud-right"></div>
+  <div class="cloud cloud-bottom"></div>
+  <div class="orbital-ring"></div>
+
+  <div class="login-card">
+    <div class="logo-shell">
+      <img src="/logo_sorec.png" alt="Logo SOREC" class="brand-logo" />
+    </div>
+
+    <div class="heading text-center">
+      <h1>Connexion</h1>
+    </div>
+
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+      <div class="form-group">
+        <label for="matricule" class="form-label">Matricule</label>
+        <input
+          id="matricule"
+          type="text"
+          class="form-control"
+          formControlName="matricule"
+          placeholder="Votre matricule"
+          [class.is-invalid]="matriculeControl.invalid && (matriculeControl.touched || submitted)" />
+        <div class="invalid-feedback d-block" *ngIf="matriculeControl.hasError('required') && (matriculeControl.touched || submitted)">
+          Le matricule est obligatoire.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="password-row">
+          <label for="password" class="form-label mb-0">Mot de passe</label>
+          <a href="#" class="forgot-link" (click)="$event.preventDefault()">Mot de passe oublie ?</a>
+        </div>
+        <input
+          id="password"
+          type="password"
+          class="form-control"
+          formControlName="password"
+          placeholder="Votre mot de passe"
+          [class.is-invalid]="passwordControl.invalid && (passwordControl.touched || submitted)" />
+        <div class="invalid-feedback d-block" *ngIf="passwordControl.hasError('required') && (passwordControl.touched || submitted)">
+          Le mot de passe est obligatoire.
+        </div>
+      </div>
+
+      <div class="auth-feedback" *ngIf="authError">
+        {{ authError }}
+      </div>
+
+      <button type="submit" class="btn btn-login">Se connecter</button>
+    </form>
+  </div>
+</section>

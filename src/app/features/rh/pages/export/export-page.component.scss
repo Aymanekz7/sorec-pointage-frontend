@@ -1,0 +1,10 @@
+.export-shell { display: grid; gap: 1.5rem; }
+.hero h2 { margin-bottom: 0.6rem; font-weight: 800; }
+.hero p { color: var(--sorec-dark-soft); margin: 0; }
+.eyebrow { margin: 0 0 0.5rem; color: var(--sorec-gold-dark); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; font-size: 0.8rem; }
+.export-card { padding: 1.5rem; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(240px, 1fr)); gap: 1rem; }
+.grid label { display: grid; gap: 0.45rem; }
+.grid span { font-weight: 700; }
+.grid input { border: 1px solid rgba(63, 76, 92, 0.12); border-radius: 14px; padding: 0.85rem 1rem; }
+.actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }

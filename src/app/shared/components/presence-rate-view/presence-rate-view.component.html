@@ -1,0 +1,126 @@
+<section class="presence-rate-shell" *ngIf="viewModel as vm">
+  <div class="page-head">
+    <div>
+      <span class="page-eyebrow">Analyse RH</span>
+      <h2>{{ vm.pageTitle }}</h2>
+      <p>Suivi journalier et hebdomadaire de la presence consolidee.</p>
+    </div>
+
+    <div class="filter-box">
+      <label for="departmentFilter">Perimetre</label>
+      <select
+        id="departmentFilter"
+        [(ngModel)]="selectedDepartment"
+        (ngModelChange)="onDepartmentChange()"
+        [disabled]="role !== 'RH'">
+        <option *ngFor="let department of vm.departments" [value]="department">{{ department }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card" *ngFor="let card of vm.summaryCards" [class]="'tone-' + card.tone">
+      <span class="summary-title">{{ card.title }}</span>
+      <strong>{{ card.value }}</strong>
+      <span class="summary-subtitle">{{ card.subtitle }}</span>
+    </article>
+  </div>
+
+  <div class="chart-grid">
+    <section class="card analytics-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Vue journaliere</span>
+          <h3>Presence des 7 derniers jours</h3>
+        </div>
+        <span class="section-badge">{{ vm.scopeLabel }}</span>
+      </div>
+      <div class="chart-host" #dailyChart></div>
+    </section>
+
+    <section class="card analytics-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Vue hebdomadaire</span>
+          <h3>Comparaison sur 4 semaines</h3>
+        </div>
+        <span class="section-badge">Objectif {{ vm.targetRate }}%</span>
+      </div>
+      <div class="chart-host" #weeklyChart></div>
+    </section>
+  </div>
+
+  <div class="table-grid">
+    <section class="card stats-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Detail journalier</span>
+          <h3>Statistiques par jour</h3>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table data-grid-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>Date</th>
+              <th>Presents</th>
+              <th>Absents</th>
+              <th>Deplacement</th>
+              <th>Conge</th>
+              <th>Taux</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of vm.dailyStats">
+              <td>{{ item.dayLabel }}</td>
+              <td>{{ item.date }}</td>
+              <td>{{ item.presents }}</td>
+              <td>{{ item.absents }}</td>
+              <td>{{ item.travel }}</td>
+              <td>{{ item.leave }}</td>
+              <td><span class="rate-pill">{{ item.rate | number:'1.0-1' }}%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card stats-card">
+      <div class="section-head">
+        <div>
+          <span class="section-eyebrow">Synthese hebdomadaire</span>
+          <h3>Evolution recente</h3>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table data-grid-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Semaine</th>
+              <th>Presents</th>
+              <th>Base</th>
+              <th>Taux</th>
+              <th>Variation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of vm.weeklyStats">
+              <td>{{ item.weekLabel }}</td>
+              <td>{{ item.presents }}</td>
+              <td>{{ item.total }}</td>
+              <td><span class="rate-pill">{{ item.rate | number:'1.0-1' }}%</span></td>
+              <td>
+                <span class="delta-pill" [class.positive]="item.variation >= 0" [class.negative]="item.variation < 0">
+                  {{ item.variation >= 0 ? '+' : '' }}{{ item.variation | number:'1.0-1' }}%
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>

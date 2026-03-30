@@ -1,0 +1,122 @@
+<section class="status-shell">
+  <div class="status-header">
+    <h2>Gestion des statuts</h2>
+    <button type="button" class="add-status-btn" (click)="openModal()">
+      <span class="btn-plus">+</span>
+      <span>Ajouter un statut</span>
+    </button>
+  </div>
+
+  <div class="info-banner" *ngIf="infoMessage">
+    {{ infoMessage }}
+  </div>
+
+  <div class="status-card">
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th>COULEUR</th>
+          <th>NOM DU STATUT</th>
+          <th>VISIBILITE</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let status of statuses; trackBy: trackByStatus">
+          <td>
+            <span class="status-color" [style.background]="status.color"></span>
+          </td>
+          <td class="status-name">{{ status.name }}</td>
+          <td>
+            <button
+              type="button"
+              class="visibility-pill"
+              [class.is-private]="status.visibility === 'Prive'"
+              (click)="toggleVisibility(status)">
+              {{ status.visibility === 'Prive' ? 'Privé' : status.visibility }}
+            </button>
+          </td>
+          <td>
+            <div class="action-group">
+              <button type="button" class="icon-btn icon-btn-edit" (click)="editStatus(status)" aria-label="Editer">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 20h4l10.2-10.2a2.1 2.1 0 0 0 0-3l-1-1a2.1 2.1 0 0 0-3 0L4 16v4zm2-3.2 9.6-9.6a.7.7 0 0 1 1 0l.2.2a.7.7 0 0 1 0 1L7.2 18H6v-1.2z" />
+                </svg>
+              </button>
+
+              <button type="button" class="icon-btn icon-btn-power" (click)="toggleActive(status)" aria-label="Activer ou desactiver">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3.2v8.1" />
+                  <path d="M8.1 5.9a7 7 0 1 0 7.8 0" />
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()">
+    <div class="status-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Ajouter un nouveau statut</h3>
+        <button type="button" class="close-btn" (click)="closeModal()" aria-label="Fermer">
+          x
+        </button>
+      </div>
+
+      <div class="form-field">
+        <label for="status-name">Nom du statut</label>
+        <input id="status-name" type="text" [(ngModel)]="form.name" />
+      </div>
+
+      <div class="form-field">
+        <label for="status-color">Couleur</label>
+        <div class="color-row">
+          <input
+            id="status-color-picker"
+            class="color-input"
+            type="color"
+            [(ngModel)]="form.color" />
+          <input
+            id="status-color"
+            type="text"
+            [(ngModel)]="form.color" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Visibilite</label>
+        <label class="radio-row">
+          <input type="radio" name="visibility" value="Public" [(ngModel)]="form.visibility" />
+          <span>Visible par tous</span>
+        </label>
+        <label class="radio-row">
+          <input type="radio" name="visibility" value="Prive" [(ngModel)]="form.visibility" />
+          <span>Privé : responsables seulement</span>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label>Autoriser les notes</label>
+        <div class="inline-choice">
+          <label class="radio-row compact">
+            <input type="radio" name="allowNotes" [value]="true" [(ngModel)]="form.allowNotes" />
+            <span>Oui</span>
+          </label>
+          <label class="radio-row compact">
+            <input type="radio" name="allowNotes" [value]="false" [(ngModel)]="form.allowNotes" />
+            <span>Non</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" (click)="closeModal()">Annuler</button>
+        <button type="button" class="save-btn" (click)="saveStatus()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</section>

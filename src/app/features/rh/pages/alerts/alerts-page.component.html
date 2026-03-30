@@ -1,0 +1,64 @@
+<section class="alerts-shell">
+  <div class="alerts-header">
+    <div>
+      <p class="eyebrow">Configuration des alertes</p>
+      <h2>Alert Rules</h2>
+    </div>
+
+    <button type="button" class="add-rule-btn" (click)="addRule()">
+      <span class="btn-plus">+</span>
+      <span>Add Rule</span>
+    </button>
+  </div>
+
+  <div class="info-banner" *ngIf="infoMessage">
+    {{ infoMessage }}
+  </div>
+
+  <div class="rules-card">
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>RULE NAME</th>
+          <th>CONDITION</th>
+          <th>THRESHOLD</th>
+          <th>VISIBILITY</th>
+          <th>ACTIVE</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let rule of rules">
+          <td class="rule-name">{{ rule.name }}</td>
+          <td>{{ rule.condition }}</td>
+          <td>{{ rule.threshold }}</td>
+          <td>
+            <button
+              type="button"
+              class="visibility-pill"
+              [class.is-private]="rule.visibility === 'Prive'"
+              (click)="toggleVisibility(rule)">
+              {{ rule.visibility }}
+            </button>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.is-active]="rule.active"
+              [attr.aria-pressed]="rule.active"
+              (click)="toggleRule(rule)">
+              <span class="toggle-thumb"></span>
+            </button>
+          </td>
+          <td>
+            <button type="button" class="icon-action" (click)="editRule(rule)" aria-label="Editer">
+              <span aria-hidden="true">✎</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,60 @@
+.app-shell {
+  --sidebar-width: 270px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(179, 155, 87, 0.18), transparent 22%),
+    radial-gradient(circle at bottom left, rgba(179, 155, 87, 0.08), transparent 24%),
+    linear-gradient(180deg, #fbf7f0 0%, #f4ece2 100%);
+}
+
+.app-shell:has(.sidebar.compact) {
+  --sidebar-width: 98px;
+}
+
+.app-shell:has(.sidebar.compact:hover) {
+  --sidebar-width: 270px;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  min-height: 100vh;
+  transition: width 0.22s ease, margin-left 0.22s ease;
+}
+
+.page-content {
+  padding: calc(78px + 2.1rem) 1.75rem 1.75rem;
+  flex: 1;
+}
+
+.app-shell:has(.sidebar.compact) .topbar {
+  left: var(--sidebar-width);
+}
+
+@media (max-width: 1024px) {
+  .app-shell {
+    --sidebar-width: 98px;
+  }
+
+  .topbar {
+    left: var(--sidebar-width);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    --sidebar-width: 0px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .page-content {
+    padding: calc(78px + 1rem) 1rem 1rem;
+  }
+}

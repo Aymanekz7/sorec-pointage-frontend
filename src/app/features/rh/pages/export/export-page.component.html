@@ -1,0 +1,20 @@
+<section class="export-shell">
+  <div class="hero">
+    <p class="eyebrow">Exports RH</p>
+    <h2>Recherche et export des donnees</h2>
+  </div>
+
+  <div class="card border-0 shadow-sm export-card">
+    <div class="grid">
+      <label><span>Matricule</span><input type="text" [(ngModel)]="matricule" placeholder="EMP001" /></label>
+      <label><span>Departement</span><input type="text" [(ngModel)]="department" placeholder="Direction IT" /></label>
+      <label><span>Date debut</span><input type="date" [(ngModel)]="dateFrom" /></label>
+      <label><span>Date fin</span><input type="date" [(ngModel)]="dateTo" /></label>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary">Exporter en Excel</button>
+      <button class="btn btn-outline-secondary">Apercu PDF</button>
+    </div>
+  </div>
+</section>

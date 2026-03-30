@@ -1,0 +1,21 @@
+<div class="app-shell">
+  <app-sidebar
+    [role]="role"
+    [configMode]="configMode">
+  </app-sidebar>
+
+  <div class="main-content">
+    <app-topbar
+      [role]="role"
+      [configMode]="configMode"
+      [userName]="userName"
+      [departmentName]="departmentName"
+      (logoutClicked)="logout()"
+      (configModeChange)="onConfigModeChange($event)">
+    </app-topbar>
+
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

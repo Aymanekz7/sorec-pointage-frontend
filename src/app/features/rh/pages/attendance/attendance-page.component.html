@@ -1,0 +1,121 @@
+<section class="attendance-shell" *ngIf="viewModel as vm">
+  <div class="hero-row">
+    <div>
+      <p class="eyebrow">{{ sessionService.isRh() ? 'Espace RH' : 'Espace manager' }}</p>
+      <h2>Statistiques</h2>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card" *ngFor="let item of vm.summaries">
+      <span class="summary-title">{{ item.title }}</span>
+      <strong>{{ item.value }}</strong>
+      <span class="summary-subtitle">{{ item.subtitle }}</span>
+    </article>
+  </div>
+
+  <div class="chart-grid" *ngIf="vm.weekChart && vm.monthChart">
+    <section class="card chart-card">
+      <div class="chart-head">
+        <span class="section-eyebrow">Statistiques</span>
+        <h3>{{ vm.weekChartTitle }}</h3>
+      </div>
+      <div class="chart-host" #weekChart></div>
+    </section>
+
+    <section class="card chart-card">
+      <div class="chart-head">
+        <span class="section-eyebrow">Statistiques</span>
+        <h3>{{ vm.monthChartTitle }}</h3>
+      </div>
+      <div class="chart-host" #monthChart></div>
+    </section>
+  </div>
+
+  <section class="table-card card border-0 shadow-sm" *ngIf="vm.presenceRows?.length">
+    <div class="table-head">
+      <span class="section-eyebrow">Liste ciblee</span>
+      <h3>{{ vm.metric === 'absence' ? 'Collaborateurs absents' : 'Collaborateurs concernes' }}</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Nom complet</th>
+            <th>Departement</th>
+            <th>Site</th>
+            <th>Statut</th>
+            <th>Motif</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of vm.presenceRows">
+            <td>{{ row.matricule }}</td>
+            <td>{{ row.fullName }}</td>
+            <td>{{ row.department }}</td>
+            <td>{{ row.site }}</td>
+            <td><span class="badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span></td>
+            <td>{{ row.reason || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="table-card card border-0 shadow-sm" *ngIf="vm.lateRows?.length">
+    <div class="table-head">
+      <span class="section-eyebrow">Controle hebdomadaire</span>
+      <h3>Collaborateurs en dessous du seuil RH</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Nom complet</th>
+            <th>Departement</th>
+            <th>Heures semaine</th>
+            <th>Seuil RH</th>
+            <th>Ecart</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of vm.lateRows">
+            <td>{{ row.matricule }}</td>
+            <td>{{ row.fullName }}</td>
+            <td>{{ row.department }}</td>
+            <td>{{ row.weeklyHours }}</td>
+            <td>{{ row.targetHours }}</td>
+            <td><span class="delta-pill negative">-{{ row.deficit }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="table-card card border-0 shadow-sm" *ngIf="vm.hoursRows?.length">
+    <div class="table-head">
+      <span class="section-eyebrow">Detail par departement</span>
+      <h3>Heures travaillees</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Departement</th>
+            <th>Mensuelle</th>
+            <th>Annuelle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of vm.hoursRows">
+            <td>{{ row.department }}</td>
+            <td>{{ row.monthly }}</td>
+            <td><span class="rate-pill">{{ row.yearly }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

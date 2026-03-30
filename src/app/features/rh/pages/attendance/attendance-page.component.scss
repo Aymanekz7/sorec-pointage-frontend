@@ -1,0 +1,128 @@
+.attendance-shell {
+  display: grid;
+  gap: 0.9rem;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.hero-row h2 {
+  margin: 0;
+  font-weight: 800;
+}
+
+.hero-row p {
+  margin: 0;
+  color: var(--sorec-dark-soft);
+}
+
+.eyebrow,
+.section-eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--sorec-gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  font-size: 0.72rem;
+  display: inline-block;
+}
+
+.summary-grid,
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.chart-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.summary-card {
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.86rem 0.92rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(63, 76, 92, 0.08);
+  box-shadow: 0 10px 24px rgba(31, 43, 56, 0.05);
+}
+
+.summary-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #6d7887;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-card strong {
+  font-size: 1.48rem;
+  line-height: 1;
+  color: #223040;
+}
+
+.summary-subtitle {
+  color: #758293;
+  font-size: 0.74rem;
+}
+
+.chart-card,
+.table-card {
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 0.9rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.chart-head,
+.table-head {
+  margin-bottom: 0.8rem;
+}
+
+.chart-head h3,
+.table-head h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #223040;
+}
+
+.chart-host {
+  height: 280px;
+}
+
+.table-card .table-responsive {
+  padding: 0;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(63, 76, 92, 0.05);
+}
+
+.rate-pill,
+.delta-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.34rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.rate-pill {
+  background: rgba(179, 155, 87, 0.14);
+  color: #7d6a3b;
+}
+
+.delta-pill.negative {
+  background: rgba(210, 96, 88, 0.14);
+  color: #b1544d;
+}
+
+@media (max-width: 900px) {
+  .summary-grid,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}

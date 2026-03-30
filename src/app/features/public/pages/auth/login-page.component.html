@@ -1,0 +1,45 @@
+<section class="login-shell">
+  <div class="login-card">
+    <div class="brand-panel">
+      <div class="brand-frame">
+        <img src="/logo_sorec.png" alt="Logo SOREC" class="brand-logo" />
+      </div>
+      <p class="brand-subtitle">Societe Royale d'Encouragement du Cheval</p>
+    </div>
+
+    <div class="card-header">
+      <p class="eyebrow">Authentification LDAP</p>
+      <h1>Connexion</h1>
+      <p>Accedez a votre espace de gestion securise.</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="submit()">
+      <label>
+        <span>Identifiant</span>
+        <input type="text" name="username" [(ngModel)]="username" placeholder="Votre identifiant LDAP" />
+      </label>
+
+      <label>
+        <span>Mot de passe</span>
+        <div class="password-field">
+          <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" placeholder="Votre mot de passe" />
+          <button type="button" class="ghost-btn" (click)="showPassword = !showPassword">
+            {{ showPassword ? 'Masquer' : 'Afficher' }}
+          </button>
+        </div>
+      </label>
+
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="submit-btn" type="submit">Se connecter</button>
+    </form>
+
+    <div class="login-hint">
+      <span>`manager / manager123`</span>
+      <span class="divider">|</span>
+      <span>`rh / responsable123`</span>
+      <span class="divider">|</span>
+      <span>`public / public123`</span>
+    </div>
+  </div>
+</section>

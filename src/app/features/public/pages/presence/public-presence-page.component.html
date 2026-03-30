@@ -1,0 +1,52 @@
+<section class="public-shell">
+  <header class="public-topbar">
+    <div class="brand-block">
+      <img src="/logo_sorec.png" alt="Logo SOREC" class="brand-logo" />
+    </div>
+
+    <div class="search-shell">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Rechercher par nom, prenom ou departement..." />
+    </div>
+
+    <div class="topbar-side">
+      <button
+        *ngIf="canReturnToDashboard"
+        type="button"
+        class="back-button"
+        (click)="goToDashboard()">
+        Retour dashboard
+      </button>
+      <div class="last-updated">Derniere mise a jour : {{ lastUpdated }}</div>
+    </div>
+  </header>
+
+  <div class="public-table card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Departement</th>
+            <th>Site</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows">
+            <td>{{ row.lastName }}</td>
+            <td>{{ row.firstName }}</td>
+            <td>{{ row.department }}</td>
+            <td>{{ row.site || '-' }}</td>
+            <td>
+              <span class="status-pill" [class.absent]="row.status === 'Absent'">{{ row.status }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

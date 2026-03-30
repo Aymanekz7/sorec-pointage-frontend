@@ -1,0 +1,32 @@
+<article class="department-card">
+  <div class="card-head">
+    <div>
+      <h3>{{ department.name }}</h3>
+      <p>{{ department.hours }} heures travaillees ce mois-ci</p>
+    </div>
+    <button type="button" class="details-btn" (click)="showDetails()">Voir details</button>
+  </div>
+
+  <div class="department-grid">
+    <div class="metric-card">
+      <span class="metric-label">Presents</span>
+      <strong>{{ department.presents }}</strong>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Absents</span>
+      <strong>{{ department.absents }}</strong>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Deplacement</span>
+      <strong>{{ department.travel }}</strong>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Conge</span>
+      <strong>{{ department.leave }}</strong>
+    </div>
+    <div class="metric-card">
+      <span class="metric-label">Autres</span>
+      <strong>{{ department.others }}</strong>
+    </div>
+  </div>
+</article>

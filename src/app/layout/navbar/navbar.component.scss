@@ -1,0 +1,30 @@
+.topbar {
+  background: var(--sorec-white);
+  padding: 18px 24px;
+  border-bottom: 2px solid var(--sorec-gold);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar h5 {
+  color: var(--sorec-dark);
+  font-weight: 700;
+}
+
+.topbar small {
+  color: var(--sorec-dark-soft);
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-box .badge {
+  background-color: var(--sorec-gold) !important;
+  color: white !important;
+  font-weight: 600;
+}
+

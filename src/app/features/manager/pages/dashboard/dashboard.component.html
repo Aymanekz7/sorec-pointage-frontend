@@ -1,0 +1,45 @@
+<section class="dashboard-shell" *ngIf="viewModel as vm">
+  <div class="hero-copy">
+    <p class="eyebrow">{{ isRh ? 'Vision RH' : 'Vue manager' }}</p>
+    <h2>{{ vm.pageTitle }}</h2>
+  </div>
+
+  <div class="band-grid">
+    <article class="band-card" *ngFor="let item of vm.band" [ngClass]="getCardClass(item.tone)">
+      <div class="band-value">{{ item.value }}</div>
+      <div class="band-label">{{ item.label }}</div>
+    </article>
+  </div>
+
+  <div class="chart-grid">
+    <div class="card chart-card">
+      <div class="card-body">
+        <h5>Semaine</h5>
+        <div class="chart-wrap"><canvas id="weekPieChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-body">
+        <h5>Week-end</h5>
+        <div class="chart-wrap"><canvas id="weekendPieChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid hours-grid" *ngIf="isRh">
+    <div class="card chart-card">
+      <div class="card-body">
+        <h5>Heures travaillees mensuelles</h5>
+        <div class="chart-wrap chart-wrap-bar"><canvas id="monthlyHoursChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-body">
+        <h5>Heures travaillees annuelles</h5>
+        <div class="chart-wrap chart-wrap-bar"><canvas id="yearlyHoursChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>

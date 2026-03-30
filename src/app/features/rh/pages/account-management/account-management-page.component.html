@@ -1,0 +1,38 @@
+<section class="admin-page">
+  <div class="page-head">
+    <div>
+      <span class="page-eyebrow">Administration RH</span>
+      <h2>Gestion des comptes</h2>
+    </div>
+    <button type="button" class="primary-btn">Nouveau compte</button>
+  </div>
+
+  <section class="card admin-card">
+    <div class="table-responsive">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Nom complet</th>
+            <th>Matricule</th>
+            <th>Role</th>
+            <th>Departement</th>
+            <th>Etat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let account of accounts">
+            <td><strong>{{ account.fullName }}</strong></td>
+            <td>{{ account.matricule }}</td>
+            <td>{{ account.role }}</td>
+            <td>{{ account.department }}</td>
+            <td>
+              <span class="state-pill" [class.active]="account.state === 'Actif'">
+                {{ account.state }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
