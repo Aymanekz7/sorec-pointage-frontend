@@ -29,8 +29,16 @@
 .summary-grid,
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.8rem;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+  justify-content: center;
+}
+
+.summary-grid.summary-grid-four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .chart-grid {
@@ -40,6 +48,8 @@
 .summary-card {
   display: grid;
   gap: 0.12rem;
+  justify-items: center;
+  text-align: center;
   padding: 0.86rem 0.92rem;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.92);

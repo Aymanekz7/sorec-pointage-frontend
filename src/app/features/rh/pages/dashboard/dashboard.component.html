@@ -1,4 +1,22 @@
 <section class="dashboard-shell">
+  <section class="card manager-overview-card" *ngIf="overviewDepartmentCard">
+    <div class="section-head manager-overview-head">
+      <div>
+        <span class="section-eyebrow">Presence du jour</span>
+        <h3>{{ overviewTitle }}</h3>
+      </div>
+      <span class="section-badge section-badge-strong">{{ overviewBadge }}</span>
+    </div>
+
+    <app-department-card
+      *ngIf="overviewDepartmentCard"
+      [department]="overviewDepartmentCard"
+      [showDetailsButton]="false"
+      (details)="loadDepartmentDetails($event)"
+    >
+    </app-department-card>
+  </section>
+
   <div class="insight-grid">
     <app-kpi-card
       *ngFor="let card of insightCards"
@@ -14,23 +32,6 @@
     >
     </app-kpi-card>
   </div>
-
-  <section class="card manager-overview-card" *ngIf="!isRhView">
-    <div class="section-head manager-overview-head">
-      <div>
-        <span class="section-eyebrow">Presence du jour</span>
-        <h3>Vue manager - {{ managerDepartmentLabel }}</h3>
-      </div>
-      <span class="section-badge section-badge-strong">{{ managerDepartmentLabel }}</span>
-    </div>
-
-    <app-department-card
-      *ngIf="managerDepartmentCard"
-      [department]="managerDepartmentCard"
-      (details)="loadDepartmentDetails($event)"
-    >
-    </app-department-card>
-  </section>
 
   <section class="departments-section" *ngIf="isRhView">
     <div class="section-head">
@@ -210,7 +211,7 @@
     <div class="section-head">
       <div>
         <span class="section-eyebrow">Presence bureau</span>
-        <h3>{{ managerDepartmentLabel }} - semaine en cours et semaine derniere</h3>
+        <h3>Presence d'aujourd'hui</h3>
       </div>
       <span class="section-badge">Mise a jour automatique</span>
     </div>
@@ -221,10 +222,7 @@
           <tr>
             <th>Matricule</th>
             <th>Collaborateur</th>
-            <th>Aujourd'hui</th>
-            <th>Cette semaine</th>
-            <th>Semaine derniere</th>
-            <th>Heures</th>
+            <th>Statut</th>
             <th>Site</th>
           </tr>
         </thead>
@@ -244,9 +242,6 @@
                 {{ row.status }}
               </span>
             </td>
-            <td>{{ row.currentWeek }}</td>
-            <td>{{ row.previousWeek }}</td>
-            <td>{{ row.workedHours }}</td>
             <td>{{ row.site || '-' }}</td>
           </tr>
         </tbody>
@@ -258,14 +253,27 @@
     <section class="card main-chart-card">
       <div class="section-head">
         <div>
-          <span class="section-eyebrow">{{
-            isRhView ? 'Analyse hebdomadaire' : 'Analyse de la semaine'
-          }}</span>
+          <span class="section-eyebrow">{{ trendEyebrow }}</span>
           <h3>Tendance des presences</h3>
         </div>
-        <span class="section-badge">{{
-          isRhView ? 'Mise a jour automatique' : managerDepartmentLabel
-        }}</span>
+        <div class="section-actions">
+          <div class="period-switch">
+            <button
+              type="button"
+              [class.active]="selectedTrendPeriod === 'today'"
+              (click)="setTrendPeriod('today')"
+            >
+              Aujourd'hui
+            </button>
+            <button
+              type="button"
+              [class.active]="selectedTrendPeriod === 'yesterday'"
+              (click)="setTrendPeriod('yesterday')"
+            >
+              Hier
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="chart-wrap chart-wrap-lg">

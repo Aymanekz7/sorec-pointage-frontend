@@ -20,6 +20,7 @@ export interface DepartmentCardStats {
 })
 export class DepartmentCardComponent {
   @Input({ required: true }) department!: DepartmentCardStats;
+  @Input() showDetailsButton = true;
   @Output() details = new EventEmitter<string>();
 
   showDetails(): void {

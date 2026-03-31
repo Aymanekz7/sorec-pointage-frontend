@@ -4,7 +4,7 @@
       <h3>{{ department.name }}</h3>
       <p>{{ department.hours }} heures travaillees ce mois-ci</p>
     </div>
-    <button type="button" class="details-btn" (click)="showDetails()">Voir details</button>
+    <button type="button" class="details-btn" *ngIf="showDetailsButton" (click)="showDetails()">Voir details</button>
   </div>
 
   <div class="department-grid">

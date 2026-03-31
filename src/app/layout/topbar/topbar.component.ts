@@ -69,6 +69,10 @@ export class TopbarComponent {
   }
 
   get eyebrow(): string {
+    if (this.role === 'RESPONSABLE' && this.departmentName) {
+      return `Manager du departement ${this.departmentName}`;
+    }
+
     return 'Presence bureau';
   }
 
@@ -94,5 +98,13 @@ export class TopbarComponent {
     }
 
     return 'Responsable';
+  }
+
+  get scopeLabel(): string {
+    if (this.role === 'RESPONSABLE' && this.departmentName) {
+      return `Visibilite limitee au departement ${this.departmentName}`;
+    }
+
+    return this.roleLabel;
   }
 }

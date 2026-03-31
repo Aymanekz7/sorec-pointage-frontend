@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } fr
 import { CommonModule } from '@angular/common';
 import Highcharts from 'highcharts';
 import { Params, Router } from '@angular/router';
+import { interval, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { KpiCardComponent } from '../../components/kpi-card/kpi-card.component';
 import {
   DepartmentCardComponent,
@@ -103,6 +104,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('weekendPieChart') weekendPieContainer?: ElementRef<HTMLDivElement>;
   followUpDepartment = 'all';
   followUpSearch = '';
+  selectedTrendPeriod: 'today' | 'yesterday' = 'today';
   addFollowUpOpen = false;
   newFollowUpType: FollowUpType = 'department';
   newFollowUpValue = '';
@@ -110,6 +112,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   departments: DepartmentCardStats[] = [];
   private allAttendances: Attendance[] = [];
   private viewReady = false;
+  private readonly destroy$ = new Subject<void>();
 
   get insightCards(): InsightCard[] {
     if (!this.isRhView) {
@@ -239,7 +242,19 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   get managerTrendData(): number[] {
     const total = this.allAttendances.length;
-    return [Math.max(total - 1, 0), total, Math.max(total - 2, 0), Math.max(total - 1, 0), total];
+    const todayData = [
+      Math.max(total - 1, 0),
+      total,
+      Math.max(total - 2, 0),
+      Math.max(total - 1, 0),
+      total,
+    ];
+
+    if (this.selectedTrendPeriod === 'today') {
+      return todayData;
+    }
+
+    return todayData.map((value, index) => Math.max(value - (index % 2 === 0 ? 1 : 2), 0));
   }
 
   private trendChart?: Highcharts.Chart;
@@ -252,6 +267,57 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   get managerDepartmentCard(): DepartmentCardStats | undefined {
     return this.departments[0];
+  }
+
+  get overviewDepartmentCard(): DepartmentCardStats | undefined {
+    if (!this.isRhView) {
+      return this.managerDepartmentCard;
+    }
+
+    if (!this.departments.length) {
+      return undefined;
+    }
+
+    return this.departments.reduce<DepartmentCardStats>(
+      (total, department) => ({
+        name: 'Tous les departements',
+        presents: total.presents + department.presents,
+        absents: total.absents + department.absents,
+        travel: total.travel + department.travel,
+        leave: total.leave + department.leave,
+        others: total.others + department.others,
+        hours: `${Number(total.hours) + Number(department.hours)}`,
+      }),
+      {
+        name: 'Tous les departements',
+        presents: 0,
+        absents: 0,
+        travel: 0,
+        leave: 0,
+        others: 0,
+        hours: '0',
+      },
+    );
+  }
+
+  get overviewTitle(): string {
+    return this.isRhView ? 'Vue RH - Tous les departements' : `Vue manager - ${this.managerDepartmentLabel}`;
+  }
+
+  get overviewBadge(): string {
+    return this.isRhView ? 'Vue globale RH' : this.managerDepartmentLabel;
+  }
+
+  get trendEyebrow(): string {
+    return this.selectedTrendPeriod === 'today' ? 'Analyse aujourd hui' : 'Analyse hier';
+  }
+
+  get trendBadge(): string {
+    if (!this.isRhView) {
+      return this.managerDepartmentLabel;
+    }
+
+    return this.selectedTrendPeriod === 'today' ? 'Aujourd hui' : 'Hier';
   }
 
   private get managerMetrics() {
@@ -270,19 +336,25 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.attendanceService.getAttendances().subscribe((rows) => {
-      const scopedRows = this.getScopedAttendances(rows);
-      this.allAttendances = scopedRows;
-      this.departments = this.buildDepartmentStats(scopedRows);
+    interval(30000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.attendanceService.getAttendances()),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((rows) => {
+        const scopedRows = this.getScopedAttendances(rows);
+        this.allAttendances = scopedRows;
+        this.departments = this.buildDepartmentStats(scopedRows);
 
-      if (this.departments.length && this.followUpDepartment === 'all') {
-        this.loadDepartmentDetails(this.departments[0].name);
-      }
+        if (this.departments.length && this.followUpDepartment === 'all') {
+          this.loadDepartmentDetails(this.departments[0].name);
+        }
 
-      if (this.viewReady) {
-        this.renderCharts();
-      }
-    });
+        if (this.viewReady) {
+          this.renderCharts();
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -294,6 +366,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.trendChart?.destroy();
     this.weekPieChart?.destroy();
     this.weekendPieChart?.destroy();
@@ -301,6 +375,17 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   openCard(route: string, queryParams?: Params): void {
     this.router.navigate([route], { queryParams });
+  }
+
+  setTrendPeriod(period: 'today' | 'yesterday'): void {
+    if (this.selectedTrendPeriod === period) {
+      return;
+    }
+
+    this.selectedTrendPeriod = period;
+    if (this.viewReady) {
+      this.renderCharts();
+    }
   }
 
   loadDepartmentDetails(department: string): void {

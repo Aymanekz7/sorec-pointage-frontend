@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <div class="summary-grid">
+  <div class="summary-grid" [class.summary-grid-four]="vm.summaries.length === 4">
     <article class="summary-card" *ngFor="let item of vm.summaries">
       <span class="summary-title">{{ item.title }}</span>
       <strong>{{ item.value }}</strong>
@@ -32,10 +32,10 @@
     </section>
   </div>
 
-  <section class="table-card card border-0 shadow-sm" *ngIf="vm.presenceRows?.length">
+  <section class="table-card card border-0 shadow-sm" *ngIf="vm.metric === 'absence' && vm.presenceRows?.length">
     <div class="table-head">
-      <span class="section-eyebrow">Liste ciblee</span>
-      <h3>{{ vm.metric === 'absence' ? 'Collaborateurs absents' : 'Collaborateurs concernes' }}</h3>
+      <span class="section-eyebrow">Aujourd'hui</span>
+      <h3>Liste des absences d'aujourd'hui</h3>
     </div>
     <div class="table-responsive">
       <table class="table data-grid-table align-middle mb-0">
@@ -43,20 +43,18 @@
           <tr>
             <th>Matricule</th>
             <th>Nom complet</th>
-            <th>Departement</th>
+            <th *ngIf="sessionService.isRh()">Departement</th>
             <th>Site</th>
             <th>Statut</th>
-            <th>Motif</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of vm.presenceRows">
             <td>{{ row.matricule }}</td>
             <td>{{ row.fullName }}</td>
-            <td>{{ row.department }}</td>
+            <td *ngIf="sessionService.isRh()">{{ row.department }}</td>
             <td>{{ row.site }}</td>
             <td><span class="badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span></td>
-            <td>{{ row.reason || '-' }}</td>
           </tr>
         </tbody>
       </table>
@@ -74,7 +72,7 @@
           <tr>
             <th>Matricule</th>
             <th>Nom complet</th>
-            <th>Departement</th>
+            <th *ngIf="sessionService.isRh()">Departement</th>
             <th>Heures semaine</th>
             <th>Seuil RH</th>
             <th>Ecart</th>
@@ -84,7 +82,7 @@
           <tr *ngFor="let row of vm.lateRows">
             <td>{{ row.matricule }}</td>
             <td>{{ row.fullName }}</td>
-            <td>{{ row.department }}</td>
+            <td *ngIf="sessionService.isRh()">{{ row.department }}</td>
             <td>{{ row.weeklyHours }}</td>
             <td>{{ row.targetHours }}</td>
             <td><span class="delta-pill negative">-{{ row.deficit }}</span></td>

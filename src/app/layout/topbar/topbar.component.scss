@@ -52,6 +52,14 @@
   line-height: 1.05;
 }
 
+.scope-copy {
+  display: inline-block;
+  margin-top: 0.2rem;
+  color: rgba(66, 51, 32, 0.82);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;
