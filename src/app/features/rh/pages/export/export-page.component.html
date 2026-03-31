@@ -5,16 +5,104 @@
   </div>
 
   <div class="card border-0 shadow-sm export-card">
-    <div class="grid">
-      <label><span>Matricule</span><input type="text" [(ngModel)]="matricule" placeholder="EMP001" /></label>
-      <label><span>Departement</span><input type="text" [(ngModel)]="department" placeholder="Direction IT" /></label>
-      <label><span>Date debut</span><input type="date" [(ngModel)]="dateFrom" /></label>
-      <label><span>Date fin</span><input type="date" [(ngModel)]="dateTo" /></label>
+    <div class="mode-switch">
+      <button
+        type="button"
+        [class.active]="exportMode === 'department'"
+        (click)="setExportMode('department')">
+        Departement
+      </button>
+      <button
+        type="button"
+        [class.active]="exportMode === 'employee'"
+        (click)="setExportMode('employee')">
+        Collaborateur
+      </button>
     </div>
 
+    <div class="grid" *ngIf="exportMode === 'department'; else employeeMode">
+      <label>
+        <span>Departement</span>
+        <select [(ngModel)]="department">
+          <option value="">Choisir un departement</option>
+          <option *ngFor="let option of departmentOptions" [value]="option">{{ option }}</option>
+        </select>
+      </label>
+      <label>
+        <span>Date debut</span>
+        <input type="date" [(ngModel)]="dateFrom" />
+      </label>
+      <label>
+        <span>Date fin</span>
+        <input type="date" [(ngModel)]="dateTo" />
+      </label>
+      <label>
+        <span>Format</span>
+        <select [(ngModel)]="selectedFormat">
+          <option value="excel">Excel</option>
+          <option value="pdf">PDF</option>
+        </select>
+      </label>
+    </div>
+
+    <ng-template #employeeMode>
+      <div class="grid employee-grid">
+        <label class="matricule-field">
+          <span>Matricule</span>
+          <input
+            type="text"
+            [ngModel]="matricule"
+            (ngModelChange)="onMatriculeChange($event)"
+            placeholder="EMP001" />
+        </label>
+
+        <label>
+          <span>Nom</span>
+          <input type="text" [value]="employeeInfo?.lastName || ''" readonly />
+        </label>
+
+        <label>
+          <span>Prenom</span>
+          <input type="text" [value]="employeeInfo?.firstName || ''" readonly />
+        </label>
+
+        <label>
+          <span>Departement</span>
+          <input type="text" [value]="employeeInfo?.department || ''" readonly />
+        </label>
+
+        <label>
+          <span>Date d'embauche</span>
+          <input type="date" [value]="employeeInfo?.hireDate || ''" readonly />
+        </label>
+
+        <label>
+          <span>Date debut</span>
+          <input type="date" [(ngModel)]="dateFrom" />
+        </label>
+
+        <label>
+          <span>Date fin</span>
+          <input type="date" [(ngModel)]="dateTo" />
+        </label>
+
+        <label>
+          <span>Format</span>
+          <select [(ngModel)]="selectedFormat">
+            <option value="excel">Excel</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="helper-text" *ngIf="matricule && !employeeInfo">
+        Aucun collaborateur trouve pour ce matricule.
+      </p>
+    </ng-template>
+
     <div class="actions">
-      <button class="btn btn-primary">Exporter en Excel</button>
-      <button class="btn btn-outline-secondary">Apercu PDF</button>
+      <button class="btn btn-primary">{{ exportLabel('excel') }}</button>
+      <button class="btn btn-outline-secondary">{{ exportLabel('pdf') }}</button>
     </div>
   </div>
 </section>
