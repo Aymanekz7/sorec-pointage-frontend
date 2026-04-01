@@ -463,6 +463,32 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     return this.followUpDepartment === 'all' ? 'Suivi cible RH' : this.followUpDepartment;
   }
 
+  get selectedRhDepartmentCard(): DepartmentCardStats | undefined {
+    if (!this.isRhView || !this.departments.length) {
+      return undefined;
+    }
+
+    return (
+      this.departments.find((department) => department.name === this.followUpDepartment) ??
+      this.departments[0]
+    );
+  }
+
+  get selectedRhDepartmentTitle(): string {
+    const department = this.selectedRhDepartmentCard;
+    return department ? `Vue departement - ${department.name}` : 'Vue departement';
+  }
+
+  get selectedRhDepartmentRows(): Attendance[] {
+    const department = this.selectedRhDepartmentCard;
+    if (!department) {
+      return [];
+    }
+
+    const sourceDepartment = department.name === 'Juridique' ? 'Legal' : department.name;
+    return this.allAttendances.filter((row) => row.department === sourceDepartment);
+  }
+
   private renderCharts(): void {
     if (!this.trendChartContainer?.nativeElement) {
       return;

@@ -22,10 +22,10 @@
     0 16px 34px rgba(86, 67, 26, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
   transition:
-    left 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease,
-    border-color 0.22s ease;
+    left var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    background var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    box-shadow var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    border-color var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .topbar-copy {

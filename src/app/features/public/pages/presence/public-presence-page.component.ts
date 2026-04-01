@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject, interval, startWith, switchMap, takeUntil } from 'rxjs';
 import { Attendance } from '../../../../shared/models/attendance.model';
 import { AttendanceService } from '../../../../core/services/attendance';
 import { SessionService } from '../../../../core/services/session.service';
@@ -13,10 +14,11 @@ import { SessionService } from '../../../../core/services/session.service';
   templateUrl: './public-presence-page.component.html',
   styleUrl: './public-presence-page.component.scss'
 })
-export class PublicPresencePageComponent implements OnInit {
+export class PublicPresencePageComponent implements OnInit, OnDestroy {
   searchText = '';
-  lastUpdated = 'Today at 10:32 AM';
+  lastUpdated = '';
   rows: Attendance[] = [];
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private attendanceService: AttendanceService,
@@ -25,9 +27,21 @@ export class PublicPresencePageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.attendanceService.getPublicAttendances().subscribe(rows => {
-      this.rows = rows;
-    });
+    interval(1800000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.attendanceService.getPublicAttendances()),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((rows) => {
+        this.rows = rows;
+        this.lastUpdated = this.formatLastUpdated(new Date());
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get filteredRows(): Attendance[] {
@@ -52,5 +66,15 @@ export class PublicPresencePageComponent implements OnInit {
 
   goToDashboard(): void {
     this.router.navigateByUrl('/dashboard');
+  }
+
+  private formatLastUpdated(date: Date): string {
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
   }
 }

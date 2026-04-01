@@ -17,15 +17,32 @@
   box-shadow:
     18px 0 48px rgba(86, 67, 26, 0.12),
     inset -1px 0 0 rgba(255, 255, 255, 0.12);
-  transition: padding 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, width 0.22s ease;
+  transition:
+    padding var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    box-shadow var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    background var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    width var(--layout-shift-duration, 0.22s) var(--layout-shift-ease, ease-out);
 }
 
 .sidebar.compact {
   width: 98px;
+  min-width: 98px;
+  max-width: 98px;
+}
+
+.sidebar.compact::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -22px;
+  width: 22px;
+  height: 100%;
 }
 
 .sidebar.compact:hover {
   width: 270px;
+  min-width: 270px;
+  max-width: 270px;
   overflow: visible;
 }
 
@@ -33,14 +50,16 @@
   padding: 0.55rem 0.55rem 0.3rem;
   display: grid;
   justify-items: center;
-  transition: padding 0.22s ease;
+  transition: padding var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .brand-logo {
   width: 100%;
   max-width: 108px;
   display: block;
-  transition: max-width 0.22s ease, transform 0.22s ease;
+  transition:
+    max-width var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    transform var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .menu {
@@ -49,7 +68,9 @@
   flex: 1;
   gap: 0.22rem;
   padding: 0.45rem 0.5rem;
-  transition: padding 0.22s ease, gap 0.22s ease;
+  transition:
+    padding var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    gap var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .menu a {
@@ -60,20 +81,86 @@
   text-decoration: none;
   padding: 0.56rem 0.62rem;
   border-radius: 13px;
-  transition: 0.22s ease;
   font-size: 0.74rem;
   font-weight: 600;
   border: 1px solid transparent;
   transition:
-    0.22s ease,
-    font-size 0.22s ease,
-    padding 0.22s ease,
-    border-radius 0.22s ease,
-    gap 0.22s ease;
+    var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    font-size var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    padding var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    border-radius var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    gap var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .menu a span:last-child {
   white-space: nowrap;
+}
+
+.menu-group {
+  display: grid;
+  gap: 0.24rem;
+  margin-top: 0.2rem;
+  justify-items: stretch;
+}
+
+.menu-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.56rem 0.62rem;
+  color: rgba(31, 31, 31, 0.84);
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: 13px;
+}
+
+.menu-group-toggle {
+  width: 100%;
+  min-height: auto;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-group.is-open .menu-group-head {
+  color: var(--sorec-text-strong);
+}
+
+.menu-group-head:hover,
+.menu-group.is-open .menu-group-head {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(246, 235, 203, 0.34));
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateX(3px);
+  box-shadow: 0 10px 22px rgba(24, 16, 8, 0.14);
+}
+
+.menu-group-items {
+  display: grid;
+  gap: 0.2rem;
+  padding-left: 1.65rem;
+  margin-left: 0.85rem;
+  border-left: 1px solid rgba(127, 111, 63, 0.18);
+}
+
+.menu-subitem {
+  position: relative;
+  padding-left: 0.15rem;
+}
+
+.menu-subitem::before {
+  content: '';
+  position: absolute;
+  left: -0.52rem;
+  top: 50%;
+  width: 0.18rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: rgba(127, 111, 63, 0.45);
+  transform: translateY(-50%);
 }
 
 .menu a:hover,
@@ -94,7 +181,10 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.28);
   box-shadow: inset 0 0 0 1px rgba(31, 31, 31, 0.06);
-  transition: width 0.22s ease, height 0.22s ease, border-radius 0.22s ease;
+  transition:
+    width var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    height var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    border-radius var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .icon svg {
@@ -102,7 +192,9 @@
   height: 14px;
   display: block;
   color: currentColor;
-  transition: width 0.22s ease, height 0.22s ease;
+  transition:
+    width var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    height var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
 }
 
 .sidebar-footer {
@@ -129,7 +221,10 @@
   font-weight: 650;
   border: 1px solid rgba(255, 255, 255, 0.2);
   outline: none;
-  transition: padding 0.22s ease, font-size 0.22s ease, opacity 0.18s ease;
+  transition:
+    padding var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    font-size var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out),
+    opacity var(--layout-shift-duration, 0.18s) var(--layout-shift-ease, ease-out);
   cursor: pointer;
 }
 
@@ -163,6 +258,28 @@
   display: none;
 }
 
+.sidebar.compact .menu-group-head span:last-child {
+  display: none;
+}
+
+.sidebar.compact .menu-group-items {
+  display: none;
+  padding-left: 1.15rem;
+}
+
+.sidebar.compact .menu-group-head {
+  width: 100%;
+  justify-content: center;
+  padding: 0.7rem 0.5rem;
+  gap: 0;
+  transform: none;
+}
+
+.sidebar.compact .menu-group-toggle {
+  width: 100%;
+  min-height: auto;
+}
+
 .sidebar.compact:hover .menu a {
   justify-content: flex-start;
   gap: 0.55rem;
@@ -172,6 +289,26 @@
 
 .sidebar.compact:hover .menu a span:last-child {
   display: inline;
+}
+
+.sidebar.compact:hover .menu-group-head span:last-child {
+  display: inline;
+}
+
+.sidebar.compact:hover .menu-group-head {
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.56rem 0.62rem;
+}
+
+.sidebar.compact:hover .menu-group-items {
+  display: grid;
+  padding-left: 1.65rem;
+  margin-left: 0.85rem;
+}
+
+.sidebar.compact:hover .menu-group-items {
+  padding-left: 1.15rem;
 }
 
 .sidebar.compact .icon {
@@ -226,6 +363,10 @@
 
   .menu a {
     justify-content: center;
+  }
+
+  .menu-group-items {
+    padding-left: 1.15rem;
   }
 }
 

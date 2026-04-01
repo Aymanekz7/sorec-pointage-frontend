@@ -1,13 +1,37 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable, of } from 'rxjs';
 import { Attendance } from '../../shared/models/attendance.model';
 import { SessionService } from './session.service';
+
+type BackendPresence = {
+  matricule: string;
+  dtPresence: string;
+  heuresTravaillees?: number | string | null;
+  codeLecteur?: string | null;
+  agent?: {
+    nom?: string | null;
+    prenom?: string | null;
+    etbLib?: string | null;
+    sceLib?: string | null;
+    lieuLib?: string | null;
+  } | null;
+  statut?: {
+    codeStatut?: string | null;
+    libelle?: string | null;
+  } | null;
+};
 
 @Injectable({
   providedIn: 'root',
 })
 export class AttendanceService {
-  constructor(private sessionService: SessionService) {}
+  private readonly apiBaseUrl = 'http://localhost:8080/api';
+
+  constructor(
+    private sessionService: SessionService,
+    private http: HttpClient,
+  ) {}
 
   private readonly attendances: Attendance[] = [
     { matricule: 'EMP001', firstName: 'Ahmed', lastName: 'Alami', department: 'Direction IT', site: 'Zenith', date: '2026-03-16', checkIn: '08:12', checkOut: '17:03', workedHours: '08h51', status: 'Present' },
@@ -36,12 +60,68 @@ export class AttendanceService {
   }
 
   getPublicAttendances(): Observable<Attendance[]> {
-    return of(
-      this.attendances.map(item => ({
-        ...item,
-        status: item.status === 'Present' ? 'Present' : 'Absent',
-        site: item.status === 'Present' ? item.site : ''
-      }))
+    return this.http.get<BackendPresence[]>(`${this.apiBaseUrl}/presences`).pipe(
+      map((rows) => rows.map((row) => this.mapBackendPresenceToPublicAttendance(row))),
+      catchError((error) => {
+        console.error('Erreur chargement presences backend /api/presences', error);
+        return of([]);
+      }),
     );
+  }
+
+  private mapBackendPresenceToPublicAttendance(row: BackendPresence): Attendance {
+    const rawStatus = row.statut?.codeStatut || row.statut?.libelle || '';
+    const normalizedStatus = this.normalizePublicStatus(rawStatus);
+    const workedHours = this.formatWorkedHours(row.heuresTravaillees);
+
+    return {
+      matricule: row.matricule,
+      firstName: row.agent?.prenom?.trim() || '-',
+      lastName: row.agent?.nom?.trim() || '-',
+      department: row.agent?.sceLib?.trim() || row.agent?.etbLib?.trim() || '-',
+      site: normalizedStatus === 'Present' ? this.normalizeSite(row.agent?.lieuLib) : '',
+      date: row.dtPresence || '',
+      checkIn: '-',
+      checkOut: '-',
+      workedHours,
+      status: normalizedStatus,
+    };
+  }
+
+  private normalizePublicStatus(status: string): 'Present' | 'Absent' {
+    const normalized = status.trim().toLowerCase();
+    return normalized === 'present' || normalized === 'p' ? 'Present' : 'Absent';
+  }
+
+  private normalizeSite(site?: string | null): 'Zenith' | 'Hors Zenith' | '' {
+    if (!site) {
+      return '';
+    }
+
+    const normalized = site.trim().toLowerCase();
+    if (normalized.includes('hors')) {
+      return 'Hors Zenith';
+    }
+
+    if (normalized.includes('zenith')) {
+      return 'Zenith';
+    }
+
+    return 'Hors Zenith';
+  }
+
+  private formatWorkedHours(value?: number | string | null): string {
+    if (value === null || value === undefined || value === '') {
+      return '00h00';
+    }
+
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) {
+      return '00h00';
+    }
+
+    const hours = Math.floor(numericValue);
+    const minutes = Math.round((numericValue - hours) * 60);
+    return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
   }
 }

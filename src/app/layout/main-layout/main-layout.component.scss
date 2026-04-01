@@ -1,5 +1,7 @@
 .app-shell {
   --sidebar-width: 270px;
+  --layout-shift-duration: 0.22s;
+  --layout-shift-ease: ease-out;
   min-height: 100vh;
   background:
     radial-gradient(circle at top right, rgba(179, 155, 87, 0.18), transparent 22%),
@@ -22,7 +24,9 @@
   margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
   min-height: 100vh;
-  transition: width 0.22s ease, margin-left 0.22s ease;
+  transition:
+    width var(--layout-shift-duration) var(--layout-shift-ease),
+    margin-left var(--layout-shift-duration) var(--layout-shift-ease);
 }
 
 .page-content {
