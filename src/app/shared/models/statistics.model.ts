@@ -1,4 +1,4 @@
-export type StatisticsMetric = 'presence' | 'absence' | 'late' | 'hours';
+export type StatisticsMetric = 'presence' | 'absence' | 'hours';
 
 export interface StatisticsPieSlice {
   name: string;

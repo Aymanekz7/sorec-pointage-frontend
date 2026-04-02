@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import Highcharts from 'highcharts';
 import { Params, Router } from '@angular/router';
 import { interval, startWith, Subject, switchMap, takeUntil } from 'rxjs';
-import { KpiCardComponent } from '../../components/kpi-card/kpi-card.component';
 import {
   DepartmentCardComponent,
   DepartmentCardStats,
@@ -37,6 +36,18 @@ type AlertItem = {
 type PresenceBoardRow = Attendance & {
   currentWeek: string;
   previousWeek: string;
+};
+
+type TargetedEmployeeRow = Attendance & {
+  hireDate: string;
+};
+
+type TargetedDepartmentRow = {
+  department: string;
+  yesterday: string;
+  twoDaysAgo: string;
+  lastWeek: string;
+  lastMonth: string;
 };
 
 const RH_INSIGHT_CARDS: InsightCard[] = [
@@ -80,7 +91,7 @@ const MANAGER_TREND_DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven'];
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, KpiCardComponent, DepartmentCardComponent],
+  imports: [CommonModule, DepartmentCardComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -97,6 +108,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   addFollowUpOpen = false;
   newFollowUpType: FollowUpType = 'department';
   newFollowUpValue = '';
+  trackedEmployeeQuery = '';
+  trackedDepartment = '';
+  selectedTargetEmployeeMatricule = '';
+  trackedEmployees: TargetedEmployeeRow[] = [];
+  trackedDepartments: TargetedDepartmentRow[] = [];
   savedFollowUps: Array<{ type: FollowUpType; label: string; value: string }> = [];
   departments: DepartmentCardStats[] = [];
   private allAttendances: Attendance[] = [];
@@ -290,6 +306,81 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     return this.selectedTrendPeriod === 'today' ? 'Analyse aujourd hui' : 'Analyse hier';
   }
 
+  get rhTargetingMode(): FollowUpType {
+    return this.newFollowUpType;
+  }
+
+  get targetedEmployee(): Attendance | undefined {
+    if (!this.isRhView) {
+      return undefined;
+    }
+
+    if (this.selectedTargetEmployeeMatricule) {
+      return this.allAttendances.find(
+        (row) => row.matricule === this.selectedTargetEmployeeMatricule,
+      );
+    }
+
+    const query = this.trackedEmployeeQuery.trim().toLowerCase();
+    if (!query) {
+      return undefined;
+    }
+
+    return this.allAttendances.find((row) => {
+      const fullName = `${row.firstName} ${row.lastName}`.toLowerCase();
+      const reverseName = `${row.lastName} ${row.firstName}`.toLowerCase();
+      return (
+        row.matricule.toLowerCase().includes(query) ||
+        row.firstName.toLowerCase().includes(query) ||
+        row.lastName.toLowerCase().includes(query) ||
+        fullName.includes(query) ||
+        reverseName.includes(query)
+      );
+    });
+  }
+
+  get employeeSuggestions(): Attendance[] {
+    const query = this.trackedEmployeeQuery.trim().toLowerCase();
+    if (!this.isRhView || this.rhTargetingMode !== 'employee' || !query) {
+      return [];
+    }
+
+    return this.allAttendances
+      .filter((row) => {
+        const fullName = `${row.firstName} ${row.lastName}`.toLowerCase();
+        const reverseName = `${row.lastName} ${row.firstName}`.toLowerCase();
+        return (
+          row.matricule.toLowerCase().includes(query) ||
+          row.firstName.toLowerCase().includes(query) ||
+          row.lastName.toLowerCase().includes(query) ||
+          fullName.includes(query) ||
+          reverseName.includes(query)
+        );
+      })
+      .slice(0, 6);
+  }
+
+  get targetedDepartmentRow(): TargetedDepartmentRow | undefined {
+    if (!this.isRhView || !this.trackedDepartment) {
+      return undefined;
+    }
+
+    const department = this.departments.find((item) => item.name === this.trackedDepartment);
+    if (!department) {
+      return undefined;
+    }
+
+    const baseHours = Number(department.hours || '0');
+
+    return {
+      department: department.name,
+      yesterday: `${Math.max(baseHours - 1, 0)}h`,
+      twoDaysAgo: `${Math.max(baseHours - 2, 0)}h`,
+      lastWeek: `${baseHours * 5}h`,
+      lastMonth: `${baseHours * 22}h`
+    };
+  }
+
   get trendBadge(): string {
     if (!this.isRhView) {
       return this.managerDepartmentLabel;
@@ -329,6 +420,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           this.loadDepartmentDetails(this.departments[0].name);
         }
 
+        if (this.departments.length && !this.trackedDepartment) {
+          this.trackedDepartment = this.departments[0].name;
+        }
+
         if (this.viewReady) {
           this.renderCharts();
         }
@@ -353,6 +448,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   openCard(route: string, queryParams?: Params): void {
     this.router.navigate([route], { queryParams });
+  }
+
+  openEmployeeDetails(matricule: string): void {
+    this.router.navigate(['/employees', matricule]);
   }
 
   setTrendPeriod(period: 'today' | 'yesterday'): void {
@@ -388,6 +487,65 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   setNewFollowUpType(type: FollowUpType): void {
     this.newFollowUpType = type;
     this.newFollowUpValue = '';
+  }
+
+  onTargetedEmployeeInput(value: string): void {
+    this.trackedEmployeeQuery = value;
+    this.selectedTargetEmployeeMatricule = '';
+  }
+
+  onTrackedDepartmentChange(value: string): void {
+    this.trackedDepartment = value;
+  }
+
+  addTargetedEmployee(): void {
+    const employee = this.targetedEmployee;
+    if (!employee) {
+      return;
+    }
+
+    const exists = this.trackedEmployees.some((row) => row.matricule === employee.matricule);
+    if (exists) {
+      return;
+    }
+
+    this.trackedEmployees = [
+      ...this.trackedEmployees,
+      {
+        ...employee,
+        hireDate: this.getHireDate(employee.matricule)
+      }
+    ];
+
+    this.trackedEmployeeQuery = '';
+    this.selectedTargetEmployeeMatricule = '';
+  }
+
+  addTargetedDepartment(): void {
+    const department = this.targetedDepartmentRow;
+    if (!department) {
+      return;
+    }
+
+    const exists = this.trackedDepartments.some((row) => row.department === department.department);
+    if (exists) {
+      return;
+    }
+
+    this.trackedDepartments = [...this.trackedDepartments, department];
+  }
+
+  selectEmployeeSuggestion(employee: Attendance): void {
+    this.trackedEmployeeQuery = `${employee.matricule} - ${employee.firstName} ${employee.lastName}`;
+    this.selectedTargetEmployeeMatricule = employee.matricule;
+  }
+
+  removeTrackedEmployee(matricule: string): void {
+    this.trackedEmployees = this.trackedEmployees.filter((row) => row.matricule !== matricule);
+  }
+
+  removeTrackedDepartment(department: string): void {
+    this.trackedDepartments = this.trackedDepartments.filter((row) => row.department !== department);
   }
 
   addFollowUp(): void {
@@ -823,6 +981,13 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private resetFollowUpForm(): void {
     this.newFollowUpType = 'department';
     this.newFollowUpValue = '';
+  }
+
+  getHireDate(matricule: string): string {
+    const numeric = Number(matricule.replace(/\D/g, '')) || 1;
+    const month = ((numeric - 1) % 9) + 1;
+    const day = ((numeric * 3) % 27) + 1;
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/2023`;
   }
 
   private formatPercent(value: number): string {

@@ -30,6 +30,7 @@ export const routes: Routes = [
       { path: 'presence-rate', component: RolePresenceRatePageComponent },
       { path: 'attendance', component: RoleAttendancePageComponent },
       { path: 'attendance/:matricule', component: EmployeeDetailPageComponent },
+      { path: 'employees/:matricule', component: EmployeeDetailPageComponent },
       { path: 'alerts', component: AlertsPageComponent },
       { path: 'export', component: ExportPageComponent, canActivate: [rhGuard] },
       { path: 'status-management', component: StatusManagementPageComponent, canActivate: [rhGuard] },

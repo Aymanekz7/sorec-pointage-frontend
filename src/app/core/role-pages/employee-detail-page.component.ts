@@ -1,42 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AttendanceService } from '../services/attendance';
 import { Attendance } from '../../shared/models/attendance.model';
-import { SessionService } from '../services/session.service';
 
 interface DailyAttendanceRecord {
   date: string;
-  dayLabel: string;
   site: string;
   checkIn: string;
   checkOut: string;
   workedHours: string;
   status: string;
+  note?: string;
 }
 
 @Component({
   selector: 'app-employee-detail-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './employee-detail-page.component.html',
   styleUrl: './employee-detail-page.component.scss'
 })
 export class EmployeeDetailPageComponent implements OnInit {
   employee?: Attendance;
-  selectedPeriod: '7days' | 'lastMonth' = '7days';
-  selectedMonth = '2026-02';
-  readonly monthOptions = [
-    { value: '2026-01', label: 'Janvier 2026' },
-    { value: '2026-02', label: 'Fevrier 2026' },
-    { value: '2026-03', label: 'Mars 2026' }
-  ];
+  selectedPeriod: 'week' | 'month' = 'week';
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly attendanceService: AttendanceService,
-    public readonly sessionService: SessionService
+    private readonly attendanceService: AttendanceService
   ) {}
 
   ngOnInit(): void {
@@ -45,69 +36,115 @@ export class EmployeeDetailPageComponent implements OnInit {
       return;
     }
 
-    this.attendanceService.getAttendances().subscribe(rows => {
-      this.employee = rows.find(row => row.matricule === matricule);
+    this.attendanceService.getAttendances().subscribe((rows) => {
+      this.employee = rows.find((row) => row.matricule === matricule);
     });
   }
 
-  get attendanceRate(): number {
-    if (!this.employee) {
-      return 0;
-    }
-
-    return this.selectedPeriod === '7days' ? 86 : 78;
-  }
-
-  get performanceStatus(): string {
-    return this.attendanceRate >= 85 ? 'Stable' : 'A surveiller';
-  }
-
-  get performanceTone(): string {
-    return this.attendanceRate >= 85 ? 'is-good' : 'is-warning';
-  }
-
-  get periodLabel(): string {
-    return this.selectedPeriod === '7days' ? '7 jours' : 'Mois precedent';
+  setPeriod(period: 'week' | 'month'): void {
+    this.selectedPeriod = period;
   }
 
   get recentRows(): DailyAttendanceRecord[] {
     const baseSite = this.employee?.site || 'Zenith';
 
-    if (this.selectedPeriod === 'lastMonth') {
+    if (this.selectedPeriod === 'month') {
       return [
-        { date: `${this.selectedMonth}-03`, dayLabel: '03', site: baseSite, checkIn: '08:07', checkOut: '16:52', workedHours: '08h45', status: 'Present' },
-        { date: `${this.selectedMonth}-07`, dayLabel: '07', site: 'Hors Zenith', checkIn: '08:18', checkOut: '16:48', workedHours: '08h30', status: 'Present' },
-        { date: `${this.selectedMonth}-12`, dayLabel: '12', site: baseSite, checkIn: '08:29', checkOut: '16:36', workedHours: '08h07', status: 'Present' },
-        { date: `${this.selectedMonth}-15`, dayLabel: '15', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Absent' },
-        { date: `${this.selectedMonth}-18`, dayLabel: '18', site: baseSite, checkIn: '08:42', checkOut: '15:58', workedHours: '07h16', status: 'Autres' },
-        { date: `${this.selectedMonth}-21`, dayLabel: '21', site: baseSite, checkIn: '08:11', checkOut: '16:43', workedHours: '08h32', status: 'Present' }
+        { date: 'lun. 03 mars', site: baseSite, checkIn: '08:07', checkOut: '16:52', workedHours: '08h45', status: 'Present' },
+        { date: 'ven. 07 mars', site: 'Hors Zenith', checkIn: '08:18', checkOut: '16:48', workedHours: '08h30', status: 'Present' },
+        { date: 'mer. 12 mars', site: baseSite, checkIn: '08:29', checkOut: '16:36', workedHours: '08h07', status: 'Present' },
+        { date: 'sam. 15 mars', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Absent', note: 'Sick leave' },
+        { date: 'mar. 18 mars', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Conge', note: 'Annual leave' },
+        { date: 'ven. 21 mars', site: baseSite, checkIn: '08:11', checkOut: '16:43', workedHours: '08h32', status: 'Present' },
+        { date: 'lun. 24 mars', site: baseSite, checkIn: '08:15', checkOut: '17:06', workedHours: '08h51', status: 'Present' },
+        { date: 'mer. 26 mars', site: 'Hors Zenith', checkIn: '08:42', checkOut: '15:58', workedHours: '07h16', status: 'Deplacement', note: 'Client visit' }
       ];
     }
 
     return [
-      { date: '2026-03-10', dayLabel: 'Lun', site: baseSite, checkIn: '08:10', checkOut: '16:51', workedHours: '08h41', status: 'Present' },
-      { date: '2026-03-11', dayLabel: 'Mar', site: 'Hors Zenith', checkIn: '08:16', checkOut: '16:47', workedHours: '08h31', status: 'Present' },
-      { date: '2026-03-12', dayLabel: 'Mer', site: baseSite, checkIn: '08:24', checkOut: '16:34', workedHours: '08h10', status: 'Present' },
-      { date: '2026-03-13', dayLabel: 'Jeu', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Absent' },
-      { date: '2026-03-14', dayLabel: 'Ven', site: baseSite, checkIn: '08:39', checkOut: '15:48', workedHours: '07h09', status: 'Autres' },
-      { date: '2026-03-15', dayLabel: 'Sam', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Conge' },
-      { date: '2026-03-16', dayLabel: 'Dim', site: baseSite, checkIn: '08:12', checkOut: '17:03', workedHours: '08h51', status: 'Present' }
+      { date: 'ven. 27 mar.', site: baseSite, checkIn: '08:43', checkOut: '17:56', workedHours: '09h13', status: 'Present' },
+      { date: 'lun. 30 mar.', site: baseSite, checkIn: '09:42', checkOut: '18:05', workedHours: '08h23', status: 'Present' },
+      { date: 'mar. 31 mar.', site: baseSite, checkIn: '09:33', checkOut: '17:15', workedHours: '07h42', status: 'Present' },
+      { date: 'mer. 1 avr.', site: baseSite, checkIn: '08:55', checkOut: '18:47', workedHours: '09h52', status: 'Present' },
+      { date: 'jeu. 2 avr.', site: '-', checkIn: '-', checkOut: '-', workedHours: '00h00', status: 'Absent', note: 'Sick leave' }
     ];
+  }
+
+  get presentCount(): number {
+    return this.recentRows.filter((row) => row.status === 'Present').length;
+  }
+
+  get absentCount(): number {
+    return this.recentRows.filter((row) => row.status === 'Absent').length;
+  }
+
+  get tripCount(): number {
+    return this.recentRows.filter((row) => row.status === 'Deplacement').length;
+  }
+
+  get leaveCount(): number {
+    return this.recentRows.filter((row) => row.status === 'Conge').length;
+  }
+
+  get totalDays(): number {
+    return this.recentRows.length;
+  }
+
+  get attendanceRate(): number {
+    return this.totalDays ? Math.round((this.presentCount / this.totalDays) * 100) : 0;
+  }
+
+  get performanceStatus(): string {
+    return this.attendanceRate >= 80 ? 'Good' : 'A surveiller';
+  }
+
+  get performanceTone(): string {
+    return this.attendanceRate >= 80 ? 'is-good' : 'is-warning';
+  }
+
+  get primaryStatus(): string {
+    return this.employee?.status === 'Present' ? 'Present' : 'Absent';
+  }
+
+  getPeriodTitle(): string {
+    return this.selectedPeriod === 'week'
+      ? 'Attendance History - Last 7 Days'
+      : 'Attendance History - Last Month';
+  }
+
+  getPeriodFootnote(): string {
+    return this.selectedPeriod === 'week' ? '7 days' : 'Month';
   }
 
   getStatusClass(status: string): string {
     switch (status) {
       case 'Present':
-        return 'text-bg-success';
+        return 'is-present';
       case 'Absent':
-        return 'text-bg-danger';
-      case 'Conge':
+        return 'is-absent';
       case 'Deplacement':
-        return 'text-bg-info';
+        return 'is-trip';
+      case 'Conge':
+        return 'is-leave';
       case 'Autres':
-        return 'text-bg-warning';
+        return 'is-other';
       default:
-        return 'text-bg-secondary';
+        return 'is-muted';
+    }
+  }
+
+  getMetricLabel(status: string): string {
+    switch (status) {
+      case 'Present':
+        return 'Present';
+      case 'Absent':
+        return 'Absent';
+      case 'Deplacement':
+        return 'On Trip';
+      case 'Conge':
+        return 'On Leave';
+      default:
+        return 'Other';
     }
   }
 }

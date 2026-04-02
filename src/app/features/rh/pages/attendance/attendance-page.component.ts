@@ -1,10 +1,19 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import Highcharts from 'highcharts';
 import { StatisticsService } from '../../../../core/services/statistics.service';
 import { SessionService } from '../../../../core/services/session.service';
 import { StatisticsMetric, StatisticsViewModel } from '../../../../shared/models/statistics.model';
+
+type MetricOption = {
+  key: StatisticsMetric;
+  title: string;
+  value: string;
+  subtitle: string;
+  tone: 'success' | 'danger' | 'neutral';
+};
 
 @Component({
   selector: 'app-attendance-page',
@@ -21,18 +30,42 @@ export class AttendancePageComponent implements AfterViewInit, OnDestroy {
   viewModel?: StatisticsViewModel;
   private weekChart?: Highcharts.Chart;
   private monthChart?: Highcharts.Chart;
+  readonly metricOptions: MetricOption[] = [
+    {
+      key: 'presence',
+      title: 'Taux de presence',
+      value: '93,4%',
+      subtitle: '214 collaborateurs presents',
+      tone: 'success'
+    },
+    {
+      key: 'absence',
+      title: 'Taux d absence',
+      value: '6,6%',
+      subtitle: '17 collaborateurs concernes',
+      tone: 'danger'
+    },
+    {
+      key: 'hours',
+      title: 'Heures travaillees',
+      value: '1 168h',
+      subtitle: 'moyenne 233h par jour',
+      tone: 'neutral'
+    }
+  ];
 
   constructor(
     private statisticsService: StatisticsService,
     public sessionService: SessionService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngAfterViewInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const metric = (params.get('metric') as StatisticsMetric | null) ?? 'presence';
-      this.metric = ['presence', 'absence', 'late', 'hours'].includes(metric) ? metric : 'presence';
+      this.metric = ['presence', 'absence', 'hours'].includes(metric) ? metric : 'presence';
       this.loadView();
     });
   }
@@ -55,6 +88,19 @@ export class AttendancePageComponent implements AfterViewInit, OnDestroy {
       default:
         return 'text-bg-secondary';
     }
+  }
+
+  selectMetric(metric: StatisticsMetric): void {
+    if (this.metric === metric) {
+      return;
+    }
+
+    this.metric = metric;
+    this.loadView();
+  }
+
+  openEmployeeDetails(matricule: string): void {
+    this.router.navigate(['/employees', matricule]);
   }
 
   private loadView(): void {

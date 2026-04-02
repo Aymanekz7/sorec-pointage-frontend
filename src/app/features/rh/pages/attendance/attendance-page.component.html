@@ -6,6 +6,23 @@
     </div>
   </div>
 
+  <div class="metric-selector-grid">
+    <button
+      type="button"
+      class="metric-selector-card"
+      *ngFor="let item of metricOptions"
+      [class.is-active]="metric === item.key"
+      [class.is-success]="item.tone === 'success'"
+      [class.is-danger]="item.tone === 'danger'"
+      [class.is-neutral]="item.tone === 'neutral'"
+      (click)="selectMetric(item.key)"
+    >
+      <span class="metric-selector-title">{{ item.title }}</span>
+      <strong>{{ item.value }}</strong>
+      <span class="metric-selector-subtitle">{{ item.subtitle }}</span>
+    </button>
+  </div>
+
   <div class="summary-grid" [class.summary-grid-four]="vm.summaries.length === 4">
     <article class="summary-card" *ngFor="let item of vm.summaries">
       <span class="summary-title">{{ item.title }}</span>
@@ -49,43 +66,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of vm.presenceRows">
+          <tr *ngFor="let row of vm.presenceRows" class="clickable-row" (click)="openEmployeeDetails(row.matricule)">
             <td>{{ row.matricule }}</td>
             <td>{{ row.fullName }}</td>
             <td *ngIf="sessionService.isRh()">{{ row.department }}</td>
             <td>{{ row.site }}</td>
             <td><span class="badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="table-card card border-0 shadow-sm" *ngIf="vm.lateRows?.length">
-    <div class="table-head">
-      <span class="section-eyebrow">Controle hebdomadaire</span>
-      <h3>Collaborateurs en dessous du seuil RH</h3>
-    </div>
-    <div class="table-responsive">
-      <table class="table data-grid-table align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Matricule</th>
-            <th>Nom complet</th>
-            <th *ngIf="sessionService.isRh()">Departement</th>
-            <th>Heures semaine</th>
-            <th>Seuil RH</th>
-            <th>Ecart</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of vm.lateRows">
-            <td>{{ row.matricule }}</td>
-            <td>{{ row.fullName }}</td>
-            <td *ngIf="sessionService.isRh()">{{ row.department }}</td>
-            <td>{{ row.weeklyHours }}</td>
-            <td>{{ row.targetHours }}</td>
-            <td><span class="delta-pill negative">-{{ row.deficit }}</span></td>
           </tr>
         </tbody>
       </table>

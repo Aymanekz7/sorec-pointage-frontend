@@ -1,29 +1,78 @@
 <section class="employee-shell" *ngIf="employee as collaborator">
   <div class="hero-row">
     <div>
-      <p class="eyebrow">{{ sessionService.isRh() ? 'Fiche collaborateur RH' : 'Fiche collaborateur' }}</p>
-      <h2>{{ collaborator.firstName }} {{ collaborator.lastName }}</h2>
-      <p>{{ collaborator.matricule }} · {{ collaborator.department }}</p>
-    </div>
-    <a routerLink="/attendance" class="back-link">Retour aux presences</a>
-  </div>
-
-  <section class="summary-card card border-0 shadow-sm">
-    <div class="summary-head">
-      <h3>Performance Summary</h3>
-      <div class="summary-filters">
-        <select [(ngModel)]="selectedPeriod">
-          <option value="7days">7 jours</option>
-          <option value="lastMonth">Mois precedent</option>
-        </select>
-        <select *ngIf="selectedPeriod === 'lastMonth'" [(ngModel)]="selectedMonth">
-          <option *ngFor="let month of monthOptions" [value]="month.value">{{ month.label }}</option>
-        </select>
+      <h1>{{ collaborator.firstName }} {{ collaborator.lastName }}</h1>
+      <div class="hero-meta">
+        <span>{{ collaborator.department }}</span>
+        <span class="status-pill" [class]="getStatusClass(primaryStatus)">{{ primaryStatus }}</span>
       </div>
     </div>
 
-    <div class="summary-grid">
-      <div>
+    <div class="hero-actions">
+      <div class="period-switch">
+        <button type="button" [class.active]="selectedPeriod === 'week'" (click)="setPeriod('week')">
+          Week
+        </button>
+        <button type="button" [class.active]="selectedPeriod === 'month'" (click)="setPeriod('month')">
+          Month
+        </button>
+      </div>
+
+      <a routerLink="/dashboard" class="back-link">Retour</a>
+    </div>
+  </div>
+
+  <section class="metric-grid">
+    <article class="metric-card is-present">
+      <strong>{{ presentCount }}</strong>
+      <span>Present</span>
+      <small>{{ attendanceRate }}% attendance rate</small>
+    </article>
+    <article class="metric-card is-absent">
+      <strong>{{ absentCount }}</strong>
+      <span>Absent</span>
+    </article>
+    <article class="metric-card is-trip">
+      <strong>{{ tripCount }}</strong>
+      <span>On Trip</span>
+    </article>
+    <article class="metric-card is-leave">
+      <strong>{{ leaveCount }}</strong>
+      <span>On Leave</span>
+    </article>
+    <article class="metric-card is-total">
+      <strong>{{ totalDays }}</strong>
+      <span>Total Days</span>
+    </article>
+  </section>
+
+  <section class="history-card">
+    <div class="history-head">
+      <h3>{{ getPeriodTitle() }}</h3>
+    </div>
+
+    <div class="history-list">
+      <article class="history-row" *ngFor="let row of recentRows">
+        <div class="history-left">
+          <span class="history-date">{{ row.date }}</span>
+          <span class="status-pill" [class]="getStatusClass(row.status)">{{ getMetricLabel(row.status) }}</span>
+          <span class="history-note" *ngIf="row.note">{{ row.note }}</span>
+        </div>
+        <div class="history-right" *ngIf="row.checkIn !== '-' || row.checkOut !== '-'">
+          <span>In: <strong>{{ row.checkIn }}</strong></span>
+          <span>Out: <strong>{{ row.checkOut }}</strong></span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="performance-card">
+    <div class="performance-head">
+      <h3>Performance Summary</h3>
+    </div>
+
+    <div class="performance-grid">
+      <div class="performance-block">
         <span class="summary-label">Attendance Rate</span>
         <div class="progress-row">
           <div class="progress">
@@ -32,45 +81,14 @@
           <strong>{{ attendanceRate }}%</strong>
         </div>
       </div>
-      <div>
+      <div class="performance-block">
         <span class="summary-label">Status</span>
         <strong [class]="performanceTone">{{ performanceStatus }}</strong>
       </div>
-      <div>
+      <div class="performance-block">
         <span class="summary-label">Period</span>
-        <strong>{{ periodLabel }}</strong>
+        <strong>{{ getPeriodFootnote() }}</strong>
       </div>
-    </div>
-  </section>
-
-  <section class="card border-0 shadow-sm history-card">
-    <div class="history-head">
-      <h3>{{ selectedPeriod === '7days' ? 'Etat des 7 derniers jours' : 'Etat du mois precedent' }}</h3>
-    </div>
-
-    <div class="table-responsive">
-      <table class="table align-middle mb-0">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Site</th>
-            <th>Entree</th>
-            <th>Sortie</th>
-            <th>Heures</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of recentRows">
-            <td>{{ row.dayLabel }}<span class="date-sub">{{ row.date }}</span></td>
-            <td>{{ row.site }}</td>
-            <td>{{ row.checkIn }}</td>
-            <td>{{ row.checkOut }}</td>
-            <td>{{ row.workedHours }}</td>
-            <td><span class="badge" [ngClass]="getStatusClass(row.status)">{{ row.status }}</span></td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </section>
 </section>

@@ -16,22 +16,6 @@
     </app-department-card>
   </section>
 
-  <div class="insight-grid">
-    <app-kpi-card
-      *ngFor="let card of insightCards"
-      [title]="card.title"
-      [value]="card.value"
-      [note]="card.note"
-      [subtitle]="card.subtitle"
-      [icon]="card.icon"
-      [tone]="card.tone"
-      [variant]="card.variant"
-      [clickable]="true"
-      (cardClick)="openCard(card.route, card.queryParams)"
-    >
-    </app-kpi-card>
-  </div>
-
   <section class="departments-section" *ngIf="isRhView">
     <div class="section-head">
       <div>
@@ -49,6 +33,145 @@
       </app-department-card>
     </div>
 
+  </section>
+
+  <section class="card rh-targeting-card" *ngIf="isRhView">
+    <div class="section-head">
+      <div>
+        <span class="section-eyebrow">Suivi cible RH</span>
+        <h3>Suivi cible RH</h3>
+      </div>
+    </div>
+
+    <div class="rh-targeting-toggle">
+      <button
+        type="button"
+        [class.active]="rhTargetingMode === 'employee'"
+        (click)="setNewFollowUpType('employee')"
+      >
+        Collaborateur
+      </button>
+      <button
+        type="button"
+        [class.active]="rhTargetingMode === 'department'"
+        (click)="setNewFollowUpType('department')"
+      >
+        Departement
+      </button>
+    </div>
+
+    <div class="rh-targeting-inline" *ngIf="rhTargetingMode === 'employee'">
+      <div class="rh-targeting-form">
+      <label for="rh-targeted-employee">Nom ou matricule</label>
+      <div class="employee-suggest-wrap">
+        <input
+          id="rh-targeted-employee"
+          type="text"
+          [value]="trackedEmployeeQuery"
+          (input)="onTargetedEmployeeInput($any($event.target).value)"
+          placeholder="Ex: AG010 ou Salma Idrissi"
+        />
+        <div class="employee-suggest-list" *ngIf="employeeSuggestions.length">
+          <button
+            type="button"
+            *ngFor="let suggestion of employeeSuggestions"
+            (click)="selectEmployeeSuggestion(suggestion)"
+          >
+            <strong>{{ suggestion.matricule }}</strong>
+            <span>{{ suggestion.firstName }} {{ suggestion.lastName }}</span>
+          </button>
+        </div>
+      </div>
+      </div>
+      <button type="button" class="add-target-btn" (click)="addTargetedEmployee()">+</button>
+    </div>
+
+    <div class="table-responsive target-table-wrap" *ngIf="trackedEmployees.length">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Departement</th>
+            <th>Date d'embauche</th>
+            <th>Statut</th>
+            <th>Heure entree</th>
+            <th>Heure sortie</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of trackedEmployees">
+            <td>{{ employee.matricule }}</td>
+            <td>{{ employee.lastName }}</td>
+            <td>{{ employee.firstName }}</td>
+            <td>{{ employee.department === 'Legal' ? 'Juridique' : employee.department }}</td>
+            <td>{{ employee.hireDate }}</td>
+            <td>
+              <span
+                class="status-chip"
+                [class.present]="employee.status === 'Present'"
+                [class.absent]="employee.status === 'Absent'"
+                [class.travel]="employee.status === 'Deplacement'"
+                [class.leave]="employee.status === 'Conge'"
+                [class.other]="employee.status === 'Autres'"
+              >
+                {{ employee.status }}
+              </span>
+            </td>
+            <td>{{ employee.checkIn }}</td>
+            <td>{{ employee.checkOut }}</td>
+            <td class="text-end">
+              <button type="button" class="delete-target-btn" (click)="removeTrackedEmployee(employee.matricule)">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rh-targeting-inline" *ngIf="rhTargetingMode === 'department'">
+      <div class="rh-targeting-form">
+      <label for="rh-targeted-department">Choisir un departement</label>
+      <select
+        id="rh-targeted-department"
+        [value]="trackedDepartment"
+        (change)="onTrackedDepartmentChange($any($event.target).value)"
+      >
+        <option *ngFor="let department of departments" [value]="department.name">
+          {{ department.name }}
+        </option>
+      </select>
+      </div>
+      <button type="button" class="add-target-btn" (click)="addTargetedDepartment()">+</button>
+    </div>
+
+    <div class="table-responsive target-table-wrap" *ngIf="trackedDepartments.length">
+      <table class="table data-grid-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Departement</th>
+            <th>Heure travaillee d'hier</th>
+            <th>J-2</th>
+            <th>Semaine derniere</th>
+            <th>Mois dernier</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let departmentRow of trackedDepartments">
+            <td>{{ departmentRow.department }}</td>
+            <td>{{ departmentRow.yesterday }}</td>
+            <td>{{ departmentRow.twoDaysAgo }}</td>
+            <td>{{ departmentRow.lastWeek }}</td>
+            <td>{{ departmentRow.lastMonth }}</td>
+            <td class="text-end">
+              <button type="button" class="delete-target-btn" (click)="removeTrackedDepartment(departmentRow.department)">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section class="card manager-board-card" *ngIf="!isRhView">
@@ -71,7 +194,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of presenceBoardRows">
+          <tr *ngFor="let row of presenceBoardRows" class="clickable-row" (click)="openEmployeeDetails(row.matricule)">
             <td>{{ row.matricule }}</td>
             <td>{{ row.firstName }} {{ row.lastName }}</td>
             <td>
